@@ -1,12 +1,11 @@
 <idea-plugin>
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <id>xyz.ihac.derrick</id>
+  <name>Derrick</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="hac@zju.edu.cn" url="https://github.com/ihac">Xiao An</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Derrick integration and automated Kubernetes deployment.
     ]]></description>
 
   <change-notes><![CDATA[
@@ -25,10 +24,20 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
+    <projectService serviceImplementation="xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider"/>
+    <applicationService serviceImplementation="xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider"/>
+    <projectConfigurable id="preference.derrick" displayName="Derrick" groupId="tools"
+                             instance="xyz.ihac.intellij.plugin.derrick.DerrickConfigurable"/>
     <!-- Add your extensions here -->
   </extensions>
 
   <actions>
+    <group id="Derrick.ActionGroup" popup="true" text="Derrick" icon="/icons/derrick_13x13.png">
+      <add-to-group group-id="MainToolBar" anchor="last"/>
+      <action id="Derrick.BuildImage" class="xyz.ihac.intellij.plugin.derrick.action.BuildAction" text="Build"></action>
+      <action id="Derrick.TestApp" class="xyz.ihac.intellij.plugin.derrick.action.TestAction" text="Test"></action>
+      <action id="Derrick.DeployApp" class="xyz.ihac.intellij.plugin.derrick.action.DeployAction" text="Deploy"></action>
+    </group>
     <!-- Add your actions here -->
   </actions>
 
