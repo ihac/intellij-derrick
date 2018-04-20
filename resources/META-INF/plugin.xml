@@ -34,9 +34,12 @@
   <actions>
     <group id="Derrick.ActionGroup" popup="true" text="Derrick" icon="/icons/derrick_13x13.png">
       <add-to-group group-id="MainToolBar" anchor="last"/>
-      <action id="Derrick.BuildImage" class="xyz.ihac.intellij.plugin.derrick.action.BuildAction" text="Build"></action>
-      <action id="Derrick.TestApp" class="xyz.ihac.intellij.plugin.derrick.action.TestAction" text="Test"></action>
-      <action id="Derrick.DeployApp" class="xyz.ihac.intellij.plugin.derrick.action.DeployAction" text="Deploy"></action>
+      <action id="Derrick.BuildImage" class="xyz.ihac.intellij.plugin.derrick.action.BuildAction"
+              text="Build" icon="/icons/build_16x16.png"></action>
+      <action id="Derrick.TestApp" class="xyz.ihac.intellij.plugin.derrick.action.TestAction"
+              text="Test" icon="/icons/test_v2_16x16.png"></action>
+      <action id="Derrick.DeployApp" class="xyz.ihac.intellij.plugin.derrick.action.DeployAction"
+              text="Deploy" icon="/icons/deploy_v2_16x16.png"></action>
     </group>
     <!-- Add your actions here -->
   </actions>
