@@ -30,10 +30,14 @@ public class DerrickSettingsForm {
     private JPanel derrickExecPathPanel;
     private JPanel workDirPathPanel;
     private JLabel derrickExecPathTestLabel;
+    private JTextField textField1;
+    private JLabel kubeConfigLabel;
+    private JPanel kubeConfigPathPanel;
 
     private TextFieldWithBrowseButton workDirPathTextField;
     private TextFieldWithBrowseButton derrickExecPathTextField;
     private TextFieldWithBrowseButton dockerExecPathTextField;
+    private TextFieldWithBrowseButton kubeConfigPathTextField;
 
     public DerrickSettingsForm(DerrickOptionProvider option, DerrickProjectOptionProvider projOption) {
         initComponents();
@@ -69,6 +73,10 @@ public class DerrickSettingsForm {
         dockerExecPathTextField = createTextFieldWithBrowseButton("Select docker executable", false);
         dockerExecPathPanel.setLayout(new BoxLayout(dockerExecPathPanel, BoxLayout.X_AXIS));
         dockerExecPathPanel.add(dockerExecPathTextField);
+
+        kubeConfigPathTextField = createTextFieldWithBrowseButton("Select kubeconfig", false);
+        kubeConfigPathPanel.setLayout(new BoxLayout(kubeConfigPathPanel, BoxLayout.X_AXIS));
+        kubeConfigPathPanel.add(kubeConfigPathTextField);
 
         registryAddressBox.setEditable(true);
 
@@ -114,6 +122,10 @@ public class DerrickSettingsForm {
 
     public String getDockerExecPath() {
         return dockerExecPathTextField.getText().trim();
+    }
+
+    public String getKubeConfigPath() {
+        return kubeConfigPathTextField.getText().trim();
     }
 
     public String getRegistryAddress() {

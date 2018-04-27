@@ -43,14 +43,14 @@ public class DerrickConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        return settingsForm!= null && projOption != null &&
-                (!Comparing.equal(settingsForm.getWorkDir(), projOption.getWorkDir()) ||
+        return settingsForm!= null && projOption != null && (!Comparing.equal(settingsForm.getWorkDir(), projOption.getWorkDir()) ||
                 !Comparing.equal(settingsForm.getDerrickExecPath(), option.getDerrickExecPath()) ||
                 !Comparing.equal(settingsForm.getDockerExecPath(), option.getDockerExecPath()) ||
                 !Comparing.equal(settingsForm.getRegistryAddress(), option.getRegistryAddress()) ||
+                !Comparing.equal(settingsForm.getKubeConfigPath(), option.getKubeConfigPath()) ||
                 !Comparing.equal(settingsForm.getUsername(), option.getUsername()) ||
                 !Comparing.equal(settingsForm.getPassword(), option.getPassword())
-                );
+        );
     }
 
     @Override
@@ -60,6 +60,7 @@ public class DerrickConfigurable implements SearchableConfigurable {
             option.setDerrickExecPath(settingsForm.getDerrickExecPath());
             option.setDockerExecPath(settingsForm.getDockerExecPath());
             option.setRegistryAddress(settingsForm.getRegistryAddress());
+            option.setKubeConfigPath(settingsForm.getKubeConfigPath());
             option.setUsername(settingsForm.getUsername());
             option.setPassword(settingsForm.getPassword());
         }

@@ -11,6 +11,7 @@ public class DerrickOptionProvider implements PersistentStateComponent<DerrickOp
     private String derrickExecPath;
     private String dockerExecPath;
     private String registryAddress;
+    private String kubeConfigPath;
     private String username;
     private String password;
 
@@ -28,6 +29,7 @@ public class DerrickOptionProvider implements PersistentStateComponent<DerrickOp
         derrickExecPath = state.getDerrickExecPath();
         dockerExecPath = state.getDockerExecPath();
         registryAddress = state.getRegistryAddress();
+        kubeConfigPath = state.getKubeConfigPath();
         username = state.getUsername();
         password = state.getPassword();
     }
@@ -42,6 +44,10 @@ public class DerrickOptionProvider implements PersistentStateComponent<DerrickOp
 
     public String getDockerExecPath() {
         return dockerExecPath;
+    }
+
+    public String getKubeConfigPath() {
+        return kubeConfigPath;
     }
 
     public String getUsername() {
@@ -62,6 +68,10 @@ public class DerrickOptionProvider implements PersistentStateComponent<DerrickOp
 
     public void setRegistryAddress(String registryAddress) {
         this.registryAddress = registryAddress;
+    }
+
+    public void setKubeConfigPath(String kubeConfigPath) {
+        this.kubeConfigPath = kubeConfigPath;
     }
 
     public void setUsername(String username) {
