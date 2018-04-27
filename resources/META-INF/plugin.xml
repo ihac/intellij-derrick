@@ -34,12 +34,14 @@
   <actions>
     <group id="Derrick.ActionGroup" popup="true" text="Derrick" icon="/icons/derrick_13x13.png">
       <add-to-group group-id="MainToolBar" anchor="last"/>
-      <action id="Derrick.BuildImage" class="xyz.ihac.intellij.plugin.derrick.action.BuildAction"
-              text="Build" icon="/icons/build_16x16.png"></action>
-      <action id="Derrick.TestApp" class="xyz.ihac.intellij.plugin.derrick.action.TestAction"
-              text="Test" icon="/icons/test_v2_16x16.png"></action>
-      <action id="Derrick.DeployApp" class="xyz.ihac.intellij.plugin.derrick.action.DeployAction"
-              text="Deploy" icon="/icons/deploy_v2_16x16.png"></action>
+      <action id="Derrick.Init" class="xyz.ihac.intellij.plugin.derrick.action.InitAction"
+              text="init" icon="/icons/success_16x16.png" description="hint text for Init action"></action>
+      <action id="Derrick.Serve" class="xyz.ihac.intellij.plugin.derrick.action.ServeAction"
+              text="serve" icon="/icons/test_v2_16x16.png" description="hint text for Serve action"></action>
+      <action id="Derrick.Push" class="xyz.ihac.intellij.plugin.derrick.action.PushAction"
+              text="push" icon="/icons/build_16x16.png" description="hint text for Push action"></action>
+      <action id="Derrick.Deploy" class="xyz.ihac.intellij.plugin.derrick.action.DeployAction"
+              text="deploy" icon="/icons/deploy_v2_16x16.png" description="hint text for Deploy action"></action>
     </group>
     <!-- Add your actions here -->
   </actions>
