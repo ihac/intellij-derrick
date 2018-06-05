@@ -3,26 +3,51 @@ package xyz.ihac.intellij.plugin.derrick.action
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.wm.ToolWindowManager
+import xyz.ihac.intellij.plugin.derrick.addon.Derrick
+import xyz.ihac.intellij.plugin.derrick.common.{MyObject, MyString, MyValue}
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 import xyz.ihac.intellij.plugin.derrick.core.Flow
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 
 class InitAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {
-    val project = e.getProject
-    val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
-    if (!eventLog.isVisible)
-      eventLog.show(null)
+    try {
+      /*
+       * preparation.
+       */
+      val project = e.getProject
+      val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
+      if (!eventLog.isVisible)
+        eventLog.show(null)
+      Logger.info("Init", "init action start...")
 
-    Logger.info("Init", "<strong>init action start...</strong>")
+      val option = ServiceManager.getService(classOf[DerrickOptionProvider])
+      val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
+      val flow = new Flow("Init", option, projOption)
 
-    val option = ServiceManager.getService(classOf[DerrickOptionProvider])
-    val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
-    val flow = new Flow("Init", option, projOption)
-    // configuration
-    val config = flow.initConfig(project);
-    if (config == null) return
+      /*
+       * generate configuration for init action.
+       */
+      val config = flow.initConfig(project);
+      if (config == null) {
+        Logger.info("Init", "init action cancelled.")
+        return
+      }
 
-    Logger.info("Init", "<b>init action done.</b>")
+      /*
+       * invoke derrick init method
+       */
+      val derrick = new Derrick(option.getDerrickExecPath, projOption.getWorkDir)
+      val rigging = config("rigging").asInstanceOf[MyString].toString
+      val params = config("params").asInstanceOf[MyObject].toScalaMap.map {
+        pair => (pair._1, pair._2.asInstanceOf[MyString].toString)
+      }
+      derrick.init(rigging, params)
+
+      Logger.info("Init", "init action done.")
+    } catch {
+      case e: Exception => Logger.error("Init", "init action failed: %s.".format(e.getMessage));
+      case _ => Logger.error("Init", "init action failed due to unknown error(s). Contact author for support.")
+    }
   }
 }

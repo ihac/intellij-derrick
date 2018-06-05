@@ -10,44 +10,44 @@ import com.intellij.openapi.wm.ToolWindowManager
 import io.kubernetes.client.apis.CoreV1Api
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}
-import xyz.ihac.intellij.plugin.derrick.core.Flow
+import xyz.ihac.intellij.plugin.derrick.core.{CloudDeployer, Flow}
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 import xyz.ihac.intellij.plugin.derrick.util.Command
 
 
 class DeployAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {
-    val project = e.getProject
-    val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
-    if (!eventLog.isVisible)
-      eventLog.show(null)
+    try {
+      /*
+       * preparation.
+       */
+      val project = e.getProject
+      val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
+      if (!eventLog.isVisible)
+        eventLog.show(null)
+      Logger.info("Deploy", "deploy action start...")
 
-    Logger.info("Deploy", "<br>deploy action start...</br>")
-    val option = ServiceManager.getService(classOf[DerrickOptionProvider])
-    val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
-    val flow = new Flow("Deploy", option, projOption)
+      val option = ServiceManager.getService(classOf[DerrickOptionProvider])
+      val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
+      val flow = new Flow("Deploy", option, projOption)
 
-    // configure
-    val config = flow.initConfig(project);
-    if (config == null) return
-
-    // build image
-    val image =
-      if (config("isRebuild").asInstanceOf[MyBoolean].toBoolean) {
-        val spec = flow.generateSpecs(project, config)
-        flow.buildImage(spec, config)
-      }
-      else {
-        val Array(name, tag) = config("imageId").toString.split(":")
-        new Image(name, tag, "")
-        // ImageLoader.load(config)
+      /*
+       * generate configuration for deploy action.
+       */
+      val config = flow.initConfig(project);
+      if (config == null) {
+        Logger.info("Deploy", "deploy action cancelled.")
+        return
       }
 
-    // deploy to cloud
-    val api = new CoreV1Api();
-
-    flow.push2Remote(image, option)
-    Logger.info("Deploy", "<br>deploy action done.</br>")
-    // deploy2Cloud(config)
+      /*
+       * deploy app to cloud.
+       */
+      flow.deploy2Cloud(config)
+      Logger.info("Deploy", "deploy action done.")
+    } catch {
+      case e: Exception => Logger.error("Deploy", "deploy action failed: %s".format(e.getMessage))
+      case _ => Logger.error("Deploy", "deploy action failed due to unknown error(s). Contact author for support.")
+    }
   }
 }
