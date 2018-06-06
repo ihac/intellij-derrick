@@ -1,15 +1,30 @@
 package xyz.ihac.intellij.plugin.derrick.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.*;
+import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.UIUtil;
+import kotlin.reflect.jvm.internal.impl.load.java.JavaClassesTracker;
+import org.jetbrains.annotations.NotNull;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
+import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
+import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.addon.Derrick;
+import xyz.ihac.intellij.plugin.derrick.util.DerrickIcon;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class DerrickSettingsForm {
     private JPanel rootPanel;
@@ -18,50 +33,189 @@ public class DerrickSettingsForm {
     private JPanel derrickSettingPanel;
     private JPanel dockerSettingPanel;
     private JPanel kubernetesSettingPanel;
-    private JTextField usernameTextField;
-    private JPasswordField passwordTextField;
-    private JComboBox registryAddressBox;
     private JPanel dockerExecPathPanel;
     private JLabel dockerExecLabel;
-    private JLabel passwordLabel;
-    private JLabel usernameLabel;
-    private JLabel registryAddressLabel;
     private JButton testButton;
     private JPanel derrickExecPathPanel;
     private JPanel workDirPathPanel;
     private JLabel derrickExecPathTestLabel;
-    private JTextField textField1;
-    private JLabel kubeConfigLabel;
-    private JPanel kubeConfigPathPanel;
+    private JPanel dockerRegistrySettingPanel;
 
     private TextFieldWithBrowseButton workDirPathTextField;
     private TextFieldWithBrowseButton derrickExecPathTextField;
     private TextFieldWithBrowseButton dockerExecPathTextField;
-    private TextFieldWithBrowseButton kubeConfigPathTextField;
 
-    public DerrickSettingsForm(DerrickOptionProvider option, DerrickProjectOptionProvider projOption) {
+    private LinkedList<K8sClusterConfiguration> k8sClusters;
+    private JBList k8sClusterList;
+    private LinkedList<DockerRegistryConfiguration> dockerRegistries;
+    private JBList dockerRegistryList;
+
+    private Project project;
+
+
+    public DerrickSettingsForm(Project project) {
+        this.project = project;
+
         initComponents();
         initBorder();
-        initDefaultValue(option, projOption);
+        initDefaultValue(project);
     }
 
-    private void initDefaultValue(DerrickOptionProvider option, DerrickProjectOptionProvider projOption) {
+    private void initDefaultValue(Project project) {
+        DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
+        DerrickProjectOptionProvider projOption = ServiceManager.getService(project, DerrickProjectOptionProvider.class);
+
         if (projOption != null) {
             workDirPathTextField.setText(projOption.getWorkDir());
         }
         if (option != null) {
+            CollectionListModel<K8sClusterConfiguration> listModel = new CollectionListModel<>();
+            k8sClusterList.setModel(listModel);
+            k8sClusters = new LinkedList<>(option.getK8sClusters());
+            for (K8sClusterConfiguration cluster: k8sClusters) {
+                listModel.add(cluster);
+            }
+
+            CollectionListModel<DockerRegistryConfiguration> listModel2 = new CollectionListModel<>();
+            dockerRegistryList.setModel(listModel2);
+            dockerRegistries = new LinkedList<>(option.getDockerRegistries());
+            for (DockerRegistryConfiguration registry: dockerRegistries) {
+                listModel2.add(registry);
+            }
+
             derrickExecPathTextField.setText(option.getDerrickExecPath());
             dockerExecPathTextField.setText(option.getDockerExecPath());
-            if (option.getRegistryAddress() != null)
-                registryAddressBox.setSelectedItem(option.getRegistryAddress());
-            else
-                registryAddressBox.setSelectedItem("registry.hub.docker.com");
-            usernameTextField.setText(option.getUsername());
-            passwordTextField.setText(option.getPassword());
         }
     }
 
     private void initComponents() {
+        dockerRegistryList = new JBList();
+        dockerRegistryList.getEmptyText().setText("No docker registry configured");
+        ToolbarDecorator dockerDecorator = ToolbarDecorator.createDecorator(dockerRegistryList).disableUpDownActions();
+        dockerDecorator.setAddAction(new AnActionButtonRunnable() {
+            @Override
+            public void run(AnActionButton anActionButton) {
+                DockerRegistryConfigForm dialog = new DockerRegistryConfigForm(project);
+                dialog.show();
+                if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                    DockerRegistryConfiguration newRegistry = new DockerRegistryConfiguration(
+                            dialog.getName(),
+                            dialog.getRegistryUrl(),
+                            dialog.getUsername(),
+                            dialog.getPassword(),
+                            dialog.getEmail());
+                    dockerRegistries.add(newRegistry);
+                    ((CollectionListModel<DockerRegistryConfiguration>) dockerRegistryList.getModel()).add(newRegistry);
+                }
+            }
+        }).setAddActionName("Add")
+        .setRemoveAction(new AnActionButtonRunnable() {
+            @Override
+            public void run(AnActionButton anActionButton) {
+                DockerRegistryConfiguration registry = (DockerRegistryConfiguration) dockerRegistryList.getSelectedValue();
+                dockerRegistries.remove(registry);
+                ((CollectionListModel<DockerRegistryConfiguration>) dockerRegistryList.getModel()).remove(registry);
+
+            }
+        }).setRemoveActionName("Remove")
+        .setEditAction(new AnActionButtonRunnable() {
+            @Override
+            public void run(AnActionButton anActionButton) {
+                int index = dockerRegistryList.getSelectedIndex();
+                DockerRegistryConfiguration registry = dockerRegistries.get(index);
+
+                DockerRegistryConfigForm dialog = new DockerRegistryConfigForm(
+                        project,
+                        registry.getName(),
+                        registry.getUrl(),
+                        registry.getUsername(),
+                        registry.getPassword(),
+                        registry.getEmail());
+                dialog.show();
+                if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                    DockerRegistryConfiguration newRegistry = new DockerRegistryConfiguration(
+                            dialog.getName(),
+                            dialog.getRegistryUrl(),
+                            dialog.getUsername(),
+                            dialog.getPassword(),
+                            dialog.getEmail());
+                    dockerRegistries.set(index, newRegistry);
+                    ((CollectionListModel<DockerRegistryConfiguration>) dockerRegistryList.getModel()).setElementAt(newRegistry, index);
+                }
+            }
+        }).setEditActionName("Edit");
+
+        dockerRegistryList.setCellRenderer(new ColoredListCellRenderer() {
+            @Override
+            protected void customizeCellRenderer(@NotNull JList list, Object value, int index, boolean selected, boolean hasFocus) {
+                DockerRegistryConfiguration registry = (DockerRegistryConfiguration) value;
+                append(registry.toString());
+                setIcon(DerrickIcon.TOOL_DOCKER());
+                if (!selected && index % 2 == 0) {
+                    setBackground(UIUtil.getDecoratedRowColor());
+                }
+            }
+        });
+        dockerRegistrySettingPanel.setMinimumSize(new Dimension(-1, 100));
+        dockerRegistrySettingPanel.setMaximumSize(new Dimension(-1, 400));
+        dockerRegistrySettingPanel.setLayout(new BoxLayout(dockerRegistrySettingPanel, BoxLayout.Y_AXIS));
+        dockerRegistrySettingPanel.add(dockerDecorator.createPanel());
+
+        k8sClusterList = new JBList();
+        k8sClusterList.getEmptyText().setText("No kubernetes cluster configured");
+        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(k8sClusterList).disableUpDownActions();
+        decorator.setAddAction(new AnActionButtonRunnable() {
+            @Override
+            public void run(AnActionButton anActionButton) {
+                K8sClusterConfigForm dialog = new K8sClusterConfigForm(project);
+                dialog.show();
+                if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                    K8sClusterConfiguration newCluster = new K8sClusterConfiguration(dialog.getClusterName(), dialog.getKubeConfigPath());
+                    k8sClusters.add(newCluster);
+                    ((CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel()).add(newCluster);
+                }
+            }
+        }).setAddActionName("Add")
+        .setRemoveAction(new AnActionButtonRunnable() {
+            @Override
+            public void run(AnActionButton anActionButton) {
+               K8sClusterConfiguration cluster = (K8sClusterConfiguration) k8sClusterList.getSelectedValue();
+               k8sClusters.remove(cluster);
+               ((CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel()).remove(cluster);
+            }
+        }).setRemoveActionName("Remove")
+        .setEditAction(new AnActionButtonRunnable() {
+            @Override
+            public void run(AnActionButton anActionButton) {
+                int index = k8sClusterList.getSelectedIndex();
+//                K8sClusterConfiguration cluster = (K8sClusterConfiguration) k8sClusterList.getSelectedValue();
+                K8sClusterConfiguration cluster = k8sClusters.get(index);
+                K8sClusterConfigForm dialog = new K8sClusterConfigForm(project, cluster.getName(), cluster.getKubeconfig());
+                dialog.show();
+                if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                    K8sClusterConfiguration newCluster = new K8sClusterConfiguration(dialog.getClusterName(), dialog.getKubeConfigPath());
+                    k8sClusters.set(index, newCluster);
+                    ((CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel()).setElementAt(newCluster, index);
+                }
+            }
+        }).setEditActionName("Edit");
+
+        k8sClusterList.setCellRenderer(new ColoredListCellRenderer() {
+            @Override
+            protected void customizeCellRenderer(@NotNull JList list, Object value, int index, boolean selected, boolean hasFocus) {
+                K8sClusterConfiguration cluster = (K8sClusterConfiguration) value;
+                append(cluster.toString());
+                setIcon(DerrickIcon.TOOL_KUBERNETES());
+                if (!selected && index % 2 == 0) {
+                    setBackground(UIUtil.getDecoratedRowColor());
+                }
+            }
+        });
+        kubernetesSettingPanel.setMinimumSize(new Dimension(-1, 100));
+        kubernetesSettingPanel.setMaximumSize(new Dimension(-1, 400));
+        kubernetesSettingPanel.setLayout(new BoxLayout(kubernetesSettingPanel, BoxLayout.Y_AXIS));
+        kubernetesSettingPanel.add(decorator.createPanel());
+
         workDirPathTextField = createTextFieldWithBrowseButton("Select work directory", true);
         workDirPathPanel.setLayout(new BoxLayout(workDirPathPanel, BoxLayout.X_AXIS));
         workDirPathPanel.add(workDirPathTextField);
@@ -74,20 +228,14 @@ public class DerrickSettingsForm {
         dockerExecPathPanel.setLayout(new BoxLayout(dockerExecPathPanel, BoxLayout.X_AXIS));
         dockerExecPathPanel.add(dockerExecPathTextField);
 
-        kubeConfigPathTextField = createTextFieldWithBrowseButton("Select kubeconfig", false);
-        kubeConfigPathPanel.setLayout(new BoxLayout(kubeConfigPathPanel, BoxLayout.X_AXIS));
-        kubeConfigPathPanel.add(kubeConfigPathTextField);
-
-        registryAddressBox.setEditable(true);
-
         derrickExecPathTestLabel.setVisible(false);
         testButton.addActionListener(e -> {
             derrickExecPathTestLabel.setVisible(true);
             String derrickComm = getDerrickExecPath();
-            if (derrickComm != null && derrickComm.equals("/usr/local/bin/derrick_demo"))
-                derrickExecPathTestLabel.setIcon(IconLoader.findIcon("/icons/success_16x16.png"));
+            if (derrickComm != null && Derrick.verify(derrickComm, workDirPathTextField.getText().trim()))
+                derrickExecPathTestLabel.setIcon(DerrickIcon.STATE_SUCCESS());
             else
-                derrickExecPathTestLabel.setIcon(IconLoader.findIcon("/icons/fail_16x16.png"));
+                derrickExecPathTestLabel.setIcon(DerrickIcon.STATE_FAIL());
         });
     }
 
@@ -124,19 +272,11 @@ public class DerrickSettingsForm {
         return dockerExecPathTextField.getText().trim();
     }
 
-    public String getKubeConfigPath() {
-        return kubeConfigPathTextField.getText().trim();
+    public LinkedList<K8sClusterConfiguration> getK8sClusters() {
+        return k8sClusters;
     }
 
-    public String getRegistryAddress() {
-        return String.valueOf(registryAddressBox.getSelectedItem()).trim();
-    }
-
-    public String getUsername() {
-        return usernameTextField.getText().trim();
-    }
-
-    public String getPassword() {
-        return String.valueOf(passwordTextField.getPassword()).trim();
+    public LinkedList<DockerRegistryConfiguration> getDockerRegistries() {
+        return dockerRegistries;
     }
 }

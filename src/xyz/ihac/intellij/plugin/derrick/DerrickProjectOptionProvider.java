@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 @State(name="DerrickProjectOptionProvider", storages={@Storage("derrick.xml")})
 public class DerrickProjectOptionProvider implements PersistentStateComponent<DerrickProjectOptionProvider> {
-    private String workDir;
+    private String workDir = "";
 
     @Nullable
     @Override
