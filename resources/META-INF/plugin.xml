@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>xyz.ihac.derrick</id>
   <name>Derrick</name>
-  <version>1.0</version>
+  <version>0.1.0-alpha</version>
   <vendor email="hac@zju.edu.cn" url="https://github.com/ihac">Xiao An</vendor>
 
   <description><![CDATA[
