@@ -156,8 +156,7 @@ public class DerrickSettingsForm {
                 }
             }
         });
-        dockerRegistrySettingPanel.setMinimumSize(new Dimension(-1, 100));
-        dockerRegistrySettingPanel.setMaximumSize(new Dimension(-1, 400));
+        dockerDecorator.setPreferredSize(new Dimension(-1, 100));
         dockerRegistrySettingPanel.setLayout(new BoxLayout(dockerRegistrySettingPanel, BoxLayout.Y_AXIS));
         dockerRegistrySettingPanel.add(dockerDecorator.createPanel());
 
@@ -188,7 +187,6 @@ public class DerrickSettingsForm {
             @Override
             public void run(AnActionButton anActionButton) {
                 int index = k8sClusterList.getSelectedIndex();
-//                K8sClusterConfiguration cluster = (K8sClusterConfiguration) k8sClusterList.getSelectedValue();
                 K8sClusterConfiguration cluster = k8sClusters.get(index);
                 K8sClusterConfigForm dialog = new K8sClusterConfigForm(project, cluster.getName(), cluster.getKubeconfig());
                 dialog.show();
@@ -211,8 +209,7 @@ public class DerrickSettingsForm {
                 }
             }
         });
-        kubernetesSettingPanel.setMinimumSize(new Dimension(-1, 100));
-        kubernetesSettingPanel.setMaximumSize(new Dimension(-1, 400));
+        decorator.setPreferredSize(new Dimension(-1, 100));
         kubernetesSettingPanel.setLayout(new BoxLayout(kubernetesSettingPanel, BoxLayout.Y_AXIS));
         kubernetesSettingPanel.add(decorator.createPanel());
 
