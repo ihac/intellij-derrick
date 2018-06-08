@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
+import xyz.ihac.intellij.plugin.derrick.util.*;
 
 import javax.swing.*;
 import java.io.File;
@@ -91,11 +92,13 @@ public class K8sClusterConfigForm extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if (getClusterName().equals(""))
+        if (!NonEmpty.verify(getClusterName()))
             return new ValidationInfo("Please enter valid name of the cluster", k8sNameTextField);
+
         String path = getKubeConfigPath();
-        if (path.equals("") || !new File(path).exists() || new File(path).isDirectory())
+        if (!NonEmpty.verify(path) || !new File(path).exists() || new File(path).isDirectory())
             return new ValidationInfo("Please enter valid kubeconfig path of the cluster", kubeConfigPathTextField);
+
         return super.doValidate();
     }
 }

@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.util.*;
 
 import javax.swing.*;
 
@@ -80,15 +81,15 @@ public class DockerRegistryConfigForm extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if (getName().equals(""))
+        if (!NonEmpty.verify(getName()))
             return new ValidationInfo("Please enter valid name of the registry", registryNameTextField);
-        if (getRegistryUrl().equals(""))
+        if (!NonEmpty.verify(getRegistryUrl()))
             return new ValidationInfo("Please enter valid url of the registry", registryAddressBox);
-        if (getUsername().equals(""))
+        if (!NonEmpty.verify(getUsername()))
             return new ValidationInfo("Please enter valid username of the registry", usernameTextField);
-        if (getPassword().equals(""))
+        if (!NonEmpty.verify(getPassword()))
             return new ValidationInfo("Please enter valid password of the registry", passwordTextField);
-        if (getEmail().equals(""))
+        if (!NonEmpty.verify(getEmail()) || !EmailFormat.verify(getEmail()))
             return new ValidationInfo("Please enter valid email of the registry", emailTextField);
         return super.doValidate();
     }
