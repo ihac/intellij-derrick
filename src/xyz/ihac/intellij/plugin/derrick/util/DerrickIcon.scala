@@ -8,7 +8,9 @@ object DerrickIcon {
 
   val ACTION_INIT = IconLoader.getIcon("/icons/build_16x16.png")
   val ACTION_DEPLOY = IconLoader.getIcon("/icons/deploy_v2_16x16.png")
+  val ACTION_ADD_ALIYUN = IconLoader.getIcon("/icons/add_aliyun_16x16.png")
 
   val TOOL_DOCKER = IconLoader.getIcon("/icons/docker_16x16.png")
   val TOOL_KUBERNETES = IconLoader.getIcon("/icons/kubernetes_16x16.png")
+  val TOOL_ALIYUN = IconLoader.getIcon("/icons/aliyun_16x16.png")
 }
