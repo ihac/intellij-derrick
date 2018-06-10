@@ -1,6 +1,7 @@
 package xyz.ihac.intellij.plugin.derrick.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
@@ -196,7 +197,19 @@ public class DerrickSettingsForm {
                     ((CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel()).setElementAt(newCluster, index);
                 }
             }
-        }).setEditActionName("Edit");
+        }).setEditActionName("Edit")
+        .addExtraAction(new AnActionButton("Add Aliyun CS Cluster", DerrickIcon.ACTION_ADD_ALIYUN()) {
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+                AliyunCSConfigForm dialog = new AliyunCSConfigForm(project);
+                dialog.show();
+                if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                    System.out.println(dialog.getAccessKeyID());
+                    System.out.println(dialog.getAccessKeySecret());
+                    System.out.println(dialog.getRegion());
+                }
+            }
+        }).setButtonComparator("Add", "Add Aliyun CS Cluster", "Remove", "Edit");
 
         k8sClusterList.setCellRenderer(new ColoredListCellRenderer() {
             @Override
