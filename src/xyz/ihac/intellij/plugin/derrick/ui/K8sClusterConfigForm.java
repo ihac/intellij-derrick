@@ -14,6 +14,9 @@ import xyz.ihac.intellij.plugin.derrick.util.*;
 import javax.swing.*;
 import java.io.File;
 
+import static xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration.ALIYUN_CS_CLUSTER;
+import static xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration.STANDARD_K8S_CLUSTER;
+
 public class K8sClusterConfigForm extends DialogWrapper {
     private JPanel rootPanel;
     private JTextField k8sNameTextField;
@@ -32,14 +35,28 @@ public class K8sClusterConfigForm extends DialogWrapper {
         initDefaultValue(project);
     }
 
-    public K8sClusterConfigForm(@Nullable Project project, String name, String kubeconfig) {
+    public K8sClusterConfigForm(@Nullable Project project, int ctype, String name, String kubeconfig) {
         this(project);
 
         if (name != null) {
             k8sNameTextField.setText(name);
         }
-        if (kubeconfig != null) {
-            kubeConfigPathTextField.setText(kubeconfig);
+        switch (ctype) {
+            case ALIYUN_CS_CLUSTER: {
+                kubeConfigPathTextField.setText("");
+                kubeConfigPathTextField.setEnabled(false);
+                kubeConfigPathLabel.setEnabled(false);
+                break;
+            }
+            case STANDARD_K8S_CLUSTER: {
+                if (kubeconfig != null) {
+                    kubeConfigPathTextField.setText(kubeconfig);
+                }
+                break;
+            }
+            default:
+                throw new IllegalArgumentException(
+                        String.format("Unknown cluster type: %d when creating K8sClusterConfig Dialog", ctype));
         }
     }
 

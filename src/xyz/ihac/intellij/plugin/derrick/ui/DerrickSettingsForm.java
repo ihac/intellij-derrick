@@ -15,10 +15,12 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import kotlin.reflect.jvm.internal.impl.load.java.JavaClassesTracker;
 import org.jetbrains.annotations.NotNull;
+import scala.collection.immutable.List;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.addon.AliyunCS;
 import xyz.ihac.intellij.plugin.derrick.addon.Derrick;
 import xyz.ihac.intellij.plugin.derrick.util.DerrickIcon;
 
@@ -170,7 +172,10 @@ public class DerrickSettingsForm {
                 K8sClusterConfigForm dialog = new K8sClusterConfigForm(project);
                 dialog.show();
                 if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-                    K8sClusterConfiguration newCluster = new K8sClusterConfiguration(dialog.getClusterName(), dialog.getKubeConfigPath());
+                    K8sClusterConfiguration newCluster = new K8sClusterConfiguration(
+                            K8sClusterConfiguration.STANDARD_K8S_CLUSTER,
+                            dialog.getClusterName(),
+                            dialog.getKubeConfigPath());
                     k8sClusters.add(newCluster);
                     ((CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel()).add(newCluster);
                 }
@@ -189,10 +194,28 @@ public class DerrickSettingsForm {
             public void run(AnActionButton anActionButton) {
                 int index = k8sClusterList.getSelectedIndex();
                 K8sClusterConfiguration cluster = k8sClusters.get(index);
-                K8sClusterConfigForm dialog = new K8sClusterConfigForm(project, cluster.getName(), cluster.getKubeconfig());
+                K8sClusterConfigForm dialog = new K8sClusterConfigForm(
+                        project,
+                        cluster.getCtype(),
+                        cluster.getName(),
+                        cluster.getKubeconfig());
                 dialog.show();
                 if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-                    K8sClusterConfiguration newCluster = new K8sClusterConfiguration(dialog.getClusterName(), dialog.getKubeConfigPath());
+                    K8sClusterConfiguration newCluster;
+                    if (cluster.getCtype() == K8sClusterConfiguration.ALIYUN_CS_CLUSTER) {
+                        newCluster = new K8sClusterConfiguration(
+                                K8sClusterConfiguration.ALIYUN_CS_CLUSTER,
+                                dialog.getClusterName(),
+                                cluster.getKubeconfig()
+                        );
+                    }
+                    else {
+                        newCluster = new K8sClusterConfiguration(
+                                K8sClusterConfiguration.STANDARD_K8S_CLUSTER,
+                                dialog.getClusterName(),
+                                dialog.getKubeConfigPath()
+                        );
+                    }
                     k8sClusters.set(index, newCluster);
                     ((CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel()).setElementAt(newCluster, index);
                 }
@@ -201,12 +224,32 @@ public class DerrickSettingsForm {
         .addExtraAction(new AnActionButton("Add Aliyun CS Cluster", DerrickIcon.ACTION_ADD_ALIYUN()) {
             @Override
             public void actionPerformed(AnActionEvent e) {
-                AliyunCSConfigForm dialog = new AliyunCSConfigForm(project);
+                AliyunCSConfigForm dialog = new AliyunCSConfigForm(project, false);
                 dialog.show();
                 if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-                    System.out.println(dialog.getAccessKeyID());
-                    System.out.println(dialog.getAccessKeySecret());
-                    System.out.println(dialog.getRegion());
+                    AliyunCS client = new AliyunCS(
+                            dialog.getRegion(),
+                            dialog.getAccessKeyID(),
+                            dialog.getAccessKeySecret());
+
+                    java.util.List<AliyunCSCluster> allClusters = client.describeClusters();
+                    dialog = new AliyunCSConfigForm(project, allClusters);
+                    dialog.show();
+                    if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                        java.util.List<AliyunCSCluster> clusters = dialog.getSelectedClusters();
+                        for (AliyunCSCluster cluster : clusters) {
+                            CollectionListModel<K8sClusterConfiguration> model =
+                                    (CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel();
+
+                            String kubeConfigContent = client.describeClusterKubeConfig(cluster.id());
+                            K8sClusterConfiguration newCluster = new K8sClusterConfiguration(
+                                    K8sClusterConfiguration.ALIYUN_CS_CLUSTER,
+                                    cluster.name(),
+                                    kubeConfigContent);
+                            model.add(newCluster);
+                            k8sClusters.add(newCluster);
+                        }
+                    }
                 }
             }
         }).setButtonComparator("Add", "Add Aliyun CS Cluster", "Remove", "Edit");
@@ -216,7 +259,12 @@ public class DerrickSettingsForm {
             protected void customizeCellRenderer(@NotNull JList list, Object value, int index, boolean selected, boolean hasFocus) {
                 K8sClusterConfiguration cluster = (K8sClusterConfiguration) value;
                 append(cluster.toString());
-                setIcon(DerrickIcon.TOOL_KUBERNETES());
+                if (cluster.getCtype() == K8sClusterConfiguration.ALIYUN_CS_CLUSTER) {
+                    setIcon(DerrickIcon.TOOL_ALIYUN());
+                }
+                else {
+                    setIcon(DerrickIcon.TOOL_KUBERNETES());
+                }
                 if (!selected && index % 2 == 0) {
                     setBackground(UIUtil.getDecoratedRowColor());
                 }

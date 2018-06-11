@@ -12,9 +12,10 @@ import com.github.dockerjava.core.command.{BuildImageResultCallback, PushImageRe
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
 import com.intellij.openapi.ui.DialogWrapper
-import io.kubernetes.client.Configuration
+import io.kubernetes.client.{ApiClient, Configuration}
 import io.kubernetes.client.apis.{CoreV1Api, ExtensionsV1beta1Api}
 import io.kubernetes.client.models.{ExtensionsV1beta1Deployment, V1ReplicationController, V1Service}
+import io.kubernetes.client.util.credentials.{Authentication, ClientCertificateAuthentication}
 import io.kubernetes.client.util.{ClientBuilder, KubeConfig, Yaml}
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 import xyz.ihac.intellij.plugin.derrick.common._
@@ -29,9 +30,13 @@ class Flow(val action: String, val option: DerrickOptionProvider, val projOption
       /*
        * create kubernetes API client.
        */
-      val file = new FileReader(config("kubeconfig").toString)
-      val kubecfg = KubeConfig.loadKubeConfig(file)
+      val kbcfg_str = config("kubeconfig").toString
+      val reader =
+        if ((new File(kbcfg_str)).exists) new FileReader(kbcfg_str);
+        else new StringReader(kbcfg_str);
+      val kubecfg = KubeConfig.loadKubeConfig(reader);
       val client = ClientBuilder.kubeconfig(kubecfg).build()
+
       Configuration.setDefaultApiClient(client)
       val v1Api = new CoreV1Api
       val extV1Beta1Api = new ExtensionsV1beta1Api
@@ -65,7 +70,7 @@ class Flow(val action: String, val option: DerrickOptionProvider, val projOption
       })
     } catch {
       // TODO: shall we handle some particular exceptions here?
-      case e: Exception => throw e
+      case e: Exception => e.printStackTrace(); throw e
     }
   }
 

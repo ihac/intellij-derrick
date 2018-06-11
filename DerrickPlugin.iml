@@ -14,5 +14,6 @@
     <orderEntry type="library" name="com.github.docker-java:docker-java:3.0.14" level="project" />
     <orderEntry type="library" name="org.slf4j:slf4j-simple:1.7.21" level="project" />
     <orderEntry type="library" name="io.kubernetes:client-java:1.0.0" level="project" />
+    <orderEntry type="library" name="com.aliyun:aliyun-java-sdk-core:3.7.1" level="project" />
   </component>
 </module>
