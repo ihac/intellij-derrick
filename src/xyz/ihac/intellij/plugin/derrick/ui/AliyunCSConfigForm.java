@@ -99,6 +99,12 @@ public class AliyunCSConfigForm extends DialogWrapper {
             if (!NonEmpty.verify(getAccessKeySecret()))
                 return new ValidationInfo("Please enter valid access key secret", accessKeySecretPasswdField);
         }
+        else {
+            for (AliyunCSCluster cluster : getSelectedClusters()) {
+                if (!NonEmpty.verify(cluster.name()))
+                    return new ValidationInfo("Please enter valid name for selected clusters");
+            }
+        }
         return super.doValidate();
     }
 

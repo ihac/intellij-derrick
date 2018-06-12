@@ -8,7 +8,10 @@ import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
+import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
+import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.*;
 
 import javax.swing.*;
@@ -111,6 +114,12 @@ public class K8sClusterConfigForm extends DialogWrapper {
     protected ValidationInfo doValidate() {
         if (!NonEmpty.verify(getClusterName()))
             return new ValidationInfo("Please enter valid name of the cluster", k8sNameTextField);
+
+        DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
+        for (K8sClusterConfiguration cluster: option.getK8sClusters()) {
+            if (!NotEqual.set(cluster.getName()).verify(getClusterName()))
+                return new ValidationInfo("Cluster name conflicts with existing clusters", k8sNameTextField);
+        }
 
         String path = getKubeConfigPath();
         if (!NonEmpty.verify(path) || !new File(path).exists() || new File(path).isDirectory())

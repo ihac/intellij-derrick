@@ -1,10 +1,13 @@
 package xyz.ihac.intellij.plugin.derrick.ui;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
+import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.*;
 
 import javax.swing.*;
@@ -91,6 +94,12 @@ public class DockerRegistryConfigForm extends DialogWrapper {
             return new ValidationInfo("Please enter valid password of the registry", passwordTextField);
         if (!NonEmpty.verify(getEmail()) || !EmailFormat.verify(getEmail()))
             return new ValidationInfo("Please enter valid email of the registry", emailTextField);
+
+        DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
+        for (DockerRegistryConfiguration registry: option.getDockerRegistries()) {
+            if (!NotEqual.set(registry.getName()).verify(getName()))
+                return new ValidationInfo("Registry name conflicts with existing registries", registryNameTextField);
+        }
         return super.doValidate();
     }
 }
