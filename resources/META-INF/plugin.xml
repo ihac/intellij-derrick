@@ -1,16 +1,52 @@
 <idea-plugin>
   <id>xyz.ihac.derrick</id>
   <name>Derrick</name>
-  <version>0.1.0-alpha</version>
-  <vendor email="hac@zju.edu.cn" url="https://github.com/ihac">Xiao An</vendor>
+  <version>0.2.0-alpha</version>
+  <vendor email="hac@zju.edu.cn" url="https://github.com/ihac/intellij-derrick">Xiao An</vendor>
 
   <description><![CDATA[
-      Derrick integration and automated Kubernetes deployment.
-    ]]></description>
+  <p>
+    Derrick integration and automated Kubernetes deployment.
+  </p>
+
+  <p>
+    Features:
+    <ul>
+      <li>Automatically detect application source code and generate Dockerfile, Kubernetes-Yaml by leveraging Derrick</li>
+      <li>Build Docker image from Dockerfile and run as test container</li>
+      <li>Push Docker image to remote registry</li>
+      <li>Deploy application to remote Kubernetes cluster</li>
+      <li>Support Aliyun Registry and Aliyun Container Service</li>
+    </ul>
+  </p>
+  ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+  <p>
+    See for all changes: https://github.com/ihac/intellij-derrick/commits/
+  </p>
+
+  <p>
+    <ul>
+      <li><strong>Important Note:</strong> You can report exception-issues directly from your IDE. Please
+      add at least a comment what you have done when it occurred / how you can reproduce it. It would be even better
+      when add an email address so I can contact you in case of questions.</li>
+
+      <li>0.2.0.alpha</li>
+        <ul>
+          <li>Support Aliyun Container Service</li>
+          <li>Add user input validation</li>
+          <li>Fix the size of registry/cluster list window</li>
+        </ul>
+
+      <li>0.1.0.alpha</li>
+        <ul>
+          <li>Add four basic actions: Init, Serve, Push and Deploy</li>
+          <li>Support multi Docker registries and multi Kubernetes clusters</li>
+        </ul>
+    </ul>
+  </p>
+
     ]]>
   </change-notes>
 
