@@ -1,12 +1,12 @@
 package xyz.ihac.intellij.plugin.derrick.addon
 
 import com.aliyuncs.http.MethodType
-import com.aliyuncs.{CommonRequest, CommonResponse, DefaultAcsClient}
 import com.aliyuncs.profile.DefaultProfile
-import play.api.libs.json.{JsArray, JsObject, Json}
+import com.aliyuncs.{CommonRequest, DefaultAcsClient}
+import play.api.libs.json.{JsObject, Json}
 import xyz.ihac.intellij.plugin.derrick.ui.AliyunCSCluster
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 class AliyunCS(val region: String,
                val accessKeyID: String,

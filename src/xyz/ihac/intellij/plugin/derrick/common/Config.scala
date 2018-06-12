@@ -1,6 +1,5 @@
 package xyz.ihac.intellij.plugin.derrick.common
 
-
 class Config(c: MyObject) {
   lazy val config: Map[String, MyValue] = c match {
     case MyObject(fields) => fields

@@ -3,11 +3,10 @@ package xyz.ihac.intellij.plugin.derrick.addon
 import java.nio.file.Paths
 
 import com.intellij.execution.ExecutionException
-import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
-import xyz.ihac.intellij.plugin.derrick.logging.Logger
+import play.api.libs.json.{JsObject, JsValue, Json}
 import xyz.ihac.intellij.plugin.derrick.util.Command
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 class Derrick(val path: String, val workDir: String) {
   private def call(subcomm: String, param: List[String]): JsValue = {

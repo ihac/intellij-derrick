@@ -3,10 +3,10 @@ package xyz.ihac.intellij.plugin.derrick.action
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.wm.ToolWindowManager
-import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}
 import xyz.ihac.intellij.plugin.derrick.core.Flow
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
+import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 
 class ServeAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {

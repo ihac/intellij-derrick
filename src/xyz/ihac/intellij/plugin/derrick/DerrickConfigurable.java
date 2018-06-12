@@ -1,7 +1,6 @@
 package xyz.ihac.intellij.plugin.derrick;
 
 import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;

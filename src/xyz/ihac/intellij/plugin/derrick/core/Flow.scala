@@ -2,26 +2,21 @@ package xyz.ihac.intellij.plugin.derrick.core
 
 import java.io._
 
-import com.github.dockerjava.api.exception.DockerClientException
-import com.github.dockerjava.api.model.Ports.Binding
-
-import scala.collection.JavaConverters._
-import com.intellij.openapi.project.Project
-import com.github.dockerjava.api.model.{BuildResponseItem, ExposedPort, Ports, PushResponseItem}
+import com.github.dockerjava.api.model.{BuildResponseItem, PushResponseItem}
 import com.github.dockerjava.core.command.{BuildImageResultCallback, PushImageResultCallback}
-import com.github.dockerjava.core.DefaultDockerClientConfig
-import com.github.dockerjava.core.DockerClientBuilder
+import com.github.dockerjava.core.{DefaultDockerClientConfig, DockerClientBuilder}
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import io.kubernetes.client.{ApiClient, Configuration}
+import io.kubernetes.client.Configuration
 import io.kubernetes.client.apis.{CoreV1Api, ExtensionsV1beta1Api}
 import io.kubernetes.client.models.{ExtensionsV1beta1Deployment, V1ReplicationController, V1Service}
-import io.kubernetes.client.util.credentials.{Authentication, ClientCertificateAuthentication}
 import io.kubernetes.client.util.{ClientBuilder, KubeConfig, Yaml}
-import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 import xyz.ihac.intellij.plugin.derrick.common._
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 import xyz.ihac.intellij.plugin.derrick.ui.DerrickConfigForm
+import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 
+import scala.collection.JavaConverters._
 import scala.io.Source.fromFile
 
 class Flow(val action: String, val option: DerrickOptionProvider, val projOption: DerrickProjectOptionProvider) {

@@ -4,10 +4,10 @@ import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.wm.ToolWindowManager
 import xyz.ihac.intellij.plugin.derrick.addon.Derrick
-import xyz.ihac.intellij.plugin.derrick.common.{MyObject, MyString, MyValue}
-import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
+import xyz.ihac.intellij.plugin.derrick.common.{MyObject, MyString}
 import xyz.ihac.intellij.plugin.derrick.core.Flow
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
+import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 
 class InitAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {

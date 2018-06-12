@@ -6,7 +6,6 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.ihac.intellij.plugin.derrick.util.Command;
 
 import java.util.LinkedList;
 

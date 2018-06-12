@@ -12,7 +12,6 @@ import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Vector;
 
 public class AliyunCSConfigForm extends DialogWrapper {
     private JPanel rootPanel;

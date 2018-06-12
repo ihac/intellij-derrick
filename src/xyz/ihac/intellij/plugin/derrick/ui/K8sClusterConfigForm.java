@@ -11,7 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
-import xyz.ihac.intellij.plugin.derrick.util.*;
+import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
+import xyz.ihac.intellij.plugin.derrick.util.NotEqual;
 
 import javax.swing.*;
 import java.io.File;

@@ -1,15 +1,14 @@
 package xyz.ihac.intellij.plugin.derrick.util
 
-import play.api.libs.json.{JsValue, Json}
-import com.intellij.execution.ExecutionException
-import com.intellij.execution.configurations.GeneralCommandLine
-
-import scala.collection.JavaConverters._
 import java.nio.file.Path
 
+import com.intellij.execution.ExecutionException
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil
+import play.api.libs.json.{JsValue, Json}
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 
+import scala.collection.JavaConverters._
 
 class Command(comm: String, args: String*) {
   val commLine = new GeneralCommandLine
