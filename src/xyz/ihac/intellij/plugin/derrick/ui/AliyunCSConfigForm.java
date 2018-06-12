@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.treetable.TreeTable;
 import org.jetbrains.annotations.Nullable;
@@ -68,11 +69,12 @@ public class AliyunCSConfigForm extends DialogWrapper {
             clusterTable.getEmptyText().setText("No kubernetes cluster found");
             StripeTable.apply(clusterTable);
 
-            ToolbarDecorator decorator = ToolbarDecorator.createDecorator(clusterTable);
-            decorator.setPreferredSize(new Dimension(-1, 100));
-            clusterTable.setVisible(true);
+            clusterTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+            JBScrollPane scrollPane = new JBScrollPane(clusterTable);
+            scrollPane.setPreferredSize(new Dimension(-1, 150));
             selectClusterPanel.setLayout(new BoxLayout(selectClusterPanel, BoxLayout.Y_AXIS));
-            selectClusterPanel.add(decorator.createPanel());
+            selectClusterPanel.add(scrollPane);
         }
         else {
             setAccessKeyPanel.setVisible(true);
