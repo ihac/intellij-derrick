@@ -10,7 +10,6 @@ import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
-import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.*;
 
@@ -115,6 +114,7 @@ public class K8sClusterConfigForm extends DialogWrapper {
         if (!NonEmpty.verify(getClusterName()))
             return new ValidationInfo("Please enter valid name of the cluster", k8sNameTextField);
 
+        // TODO: Clusters which are not applied should be considered.
         DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
         for (K8sClusterConfiguration cluster: option.getK8sClusters()) {
             if (!NotEqual.set(cluster.getName()).verify(getClusterName()))

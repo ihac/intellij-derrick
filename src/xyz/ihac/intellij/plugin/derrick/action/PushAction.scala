@@ -9,7 +9,6 @@ import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}
 import xyz.ihac.intellij.plugin.derrick.core.Flow
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 
-
 class PushAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {
     try {

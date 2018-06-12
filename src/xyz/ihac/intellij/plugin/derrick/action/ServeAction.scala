@@ -2,7 +2,6 @@ package xyz.ihac.intellij.plugin.derrick.action
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindowManager
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}

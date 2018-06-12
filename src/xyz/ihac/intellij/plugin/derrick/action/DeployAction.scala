@@ -1,19 +1,12 @@
 package xyz.ihac.intellij.plugin.derrick.action
 
-import java.io.File
-import java.nio.file.{Path, Paths}
-
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.wm.ToolWindowManager
-import io.kubernetes.client.apis.CoreV1Api
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
-import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}
 import xyz.ihac.intellij.plugin.derrick.core.{CloudDeployer, Flow}
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
-import xyz.ihac.intellij.plugin.derrick.util.Command
-
 
 class DeployAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {

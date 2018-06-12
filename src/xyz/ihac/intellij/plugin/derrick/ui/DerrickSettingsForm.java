@@ -1,6 +1,5 @@
 package xyz.ihac.intellij.plugin.derrick.ui;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -8,14 +7,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
-import kotlin.reflect.jvm.internal.impl.load.java.JavaClassesTracker;
 import org.jetbrains.annotations.NotNull;
-import scala.collection.immutable.List;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
@@ -26,7 +21,6 @@ import xyz.ihac.intellij.plugin.derrick.util.DerrickIcon;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Collection;
 import java.util.LinkedList;
 
 public class DerrickSettingsForm {

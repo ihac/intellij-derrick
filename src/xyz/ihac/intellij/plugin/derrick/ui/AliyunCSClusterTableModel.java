@@ -1,7 +1,5 @@
 package xyz.ihac.intellij.plugin.derrick.ui;
 
-import xyz.ihac.intellij.plugin.derrick.addon.AliyunCS;
-
 import javax.swing.table.AbstractTableModel;
 import java.util.LinkedList;
 import java.util.List;

@@ -4,14 +4,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.StripeTable;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.ui.ColoredTableCellRenderer;
-import com.intellij.ui.ToolbarDecorator;
-import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
-import com.intellij.ui.treeStructure.treetable.TreeTable;
 import org.jetbrains.annotations.Nullable;
-import xyz.ihac.intellij.plugin.derrick.addon.AliyunCS;
 import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
 
 import javax.swing.*;

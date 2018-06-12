@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
-import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.*;
 
 import javax.swing.*;
@@ -95,6 +94,7 @@ public class DockerRegistryConfigForm extends DialogWrapper {
         if (!NonEmpty.verify(getEmail()) || !EmailFormat.verify(getEmail()))
             return new ValidationInfo("Please enter valid email of the registry", emailTextField);
 
+        // TODO: Registries which are not applied should be considered.
         DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
         for (DockerRegistryConfiguration registry: option.getDockerRegistries()) {
             if (!NotEqual.set(registry.getName()).verify(getName()))
