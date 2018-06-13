@@ -231,17 +231,28 @@ public class DerrickSettingsForm {
                     dialog.show();
                     if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
                         java.util.List<AliyunCSCluster> clusters = dialog.getSelectedClusters();
-                        for (AliyunCSCluster cluster : clusters) {
-                            CollectionListModel<K8sClusterConfiguration> model =
-                                    (CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel();
+                        if (clusters.size() != 0) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    k8sClusterList.setPaintBusy(true);
+                                    k8sClusterList.setToolTipText("downloading certificates of your clusters");
+                                    for (AliyunCSCluster cluster : clusters) {
+                                        CollectionListModel<K8sClusterConfiguration> model =
+                                                (CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel();
 
-                            String kubeConfigContent = client.describeClusterKubeConfig(cluster.id());
-                            K8sClusterConfiguration newCluster = new K8sClusterConfiguration(
-                                    K8sClusterConfiguration.ALIYUN_CS_CLUSTER,
-                                    cluster.name(),
-                                    kubeConfigContent);
-                            model.add(newCluster);
-                            k8sClusters.add(newCluster);
+                                        String kubeConfigContent = client.describeClusterKubeConfig(cluster.id());
+                                        K8sClusterConfiguration newCluster = new K8sClusterConfiguration(
+                                                K8sClusterConfiguration.ALIYUN_CS_CLUSTER,
+                                                cluster.name(),
+                                                kubeConfigContent);
+                                        model.add(newCluster);
+                                        k8sClusters.add(newCluster);
+                                    }
+                                    k8sClusterList.setPaintBusy(false);
+                                    k8sClusterList.setToolTipText(null);
+                                }
+                            }).start();
                         }
                     }
                 }
