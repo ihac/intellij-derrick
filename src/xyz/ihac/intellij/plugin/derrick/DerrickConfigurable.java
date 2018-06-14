@@ -1,6 +1,7 @@
 package xyz.ihac.intellij.plugin.derrick;
 
 import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
@@ -12,7 +13,7 @@ import xyz.ihac.intellij.plugin.derrick.ui.DerrickSettingsForm;
 
 import javax.swing.*;
 
-public class DerrickConfigurable implements SearchableConfigurable {
+public class DerrickConfigurable implements SearchableConfigurable, Configurable.NoScroll {
     private Project project;
     private DerrickOptionProvider option;
     private DerrickProjectOptionProvider projOption;
@@ -45,16 +46,6 @@ public class DerrickConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-//        if (!Comparing.equal(settingsForm.getWorkDir(), projOption.getWorkDir()))
-//            System.out.println("workDir: " + projOption.getWorkDir());
-//        if (!Comparing.equal(settingsForm.getDerrickExecPath(), option.getDerrickExecPath()))
-//            System.out.println("DerrickExecPath: " + option.getDerrickExecPath());
-//        if (!Comparing.equal(settingsForm.getDockerExecPath(), option.getDockerExecPath()))
-//            System.out.println("DockerExecPath: " + option.getDockerExecPath());
-//        if (!Comparing.equal(settingsForm.getK8sClusters(), option.getK8sClusters()))
-//            System.out.println("K8sCluster: " + option.getK8sClusters());
-//        if (!Comparing.equal(settingsForm.getDockerRegistries(), option.getDockerRegistries()))
-//            System.out.println("DockerRegistry: " + option.getDockerRegistries());
         return settingsForm!= null && projOption != null && (!Comparing.equal(settingsForm.getWorkDir(), projOption.getWorkDir()) ||
                 !Comparing.equal(settingsForm.getDerrickExecPath(), option.getDerrickExecPath()) ||
                 !Comparing.equal(settingsForm.getDockerExecPath(), option.getDockerExecPath()) ||

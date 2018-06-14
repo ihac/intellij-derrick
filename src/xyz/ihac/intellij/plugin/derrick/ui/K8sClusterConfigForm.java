@@ -4,7 +4,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +63,6 @@ public class K8sClusterConfigForm extends DialogWrapper {
     }
 
     private TextFieldWithBrowseButton createTextFieldWithBrowseButton(String browserTitle, Boolean chooseDir) {
-        LabeledComponent<TextFieldWithBrowseButton> labeledComponent = new LabeledComponent<>();
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
         textField.addBrowseFolderListener(browserTitle, "", null,
                 new FileChooserDescriptor(!chooseDir, chooseDir, false, false, false, false));
