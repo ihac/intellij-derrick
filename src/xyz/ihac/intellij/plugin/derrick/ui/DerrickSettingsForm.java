@@ -16,7 +16,7 @@ import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.addon.AliyunCS;
-import xyz.ihac.intellij.plugin.derrick.addon.Derrick;
+import xyz.ihac.intellij.plugin.derrick.derrick.Derrick;
 import xyz.ihac.intellij.plugin.derrick.util.DerrickIcon;
 
 import javax.swing.*;
