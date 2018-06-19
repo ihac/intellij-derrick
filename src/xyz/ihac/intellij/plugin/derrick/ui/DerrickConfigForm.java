@@ -12,7 +12,7 @@ import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
-import xyz.ihac.intellij.plugin.derrick.addon.Derrick;
+import xyz.ihac.intellij.plugin.derrick.derrick.Derrick;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,6 +22,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 public class DerrickConfigForm extends DialogWrapper {
@@ -52,7 +54,8 @@ public class DerrickConfigForm extends DialogWrapper {
 
     private String action;
 
-    public DerrickConfigForm(@Nullable Project project, String action) {
+    public DerrickConfigForm(@Nullable Project project,
+                             String action) {
         super(project);
         super.init();
         super.setTitle("%s Config".format(action));
@@ -67,15 +70,17 @@ public class DerrickConfigForm extends DialogWrapper {
         derrickRiggingPanel.setVisible(false);
 
         initComponents();
-        initRiggings(project);
         initDefaultValue(project);
     }
+    public DerrickConfigForm(@Nullable Project project,
+                             String action,
+                             Map<String, List<Map<String, String>>> riggingsAndParams) {
+        this(project, action);
 
-    private void initRiggings(Project project) {
-        DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
-        DerrickProjectOptionProvider projOption = ServiceManager.getService(project, DerrickProjectOptionProvider.class);
-        java.util.Map<String, java.util.List<java.util.Map<String, String>>> riggingsAndParams =
-                Derrick.get_riggings_and_params(option.getDerrickExecPath(), projOption.getWorkDir());
+        initRiggings(riggingsAndParams);
+    }
+
+    private void initRiggings(Map<String, List<Map<String, String>>> riggingsAndParams) {
         derrickRiggingComboBox.addActionListener(e -> {
             String rigging = (String) derrickRiggingComboBox.getSelectedItem();
             initTable(riggingsAndParams.get(rigging));
@@ -146,17 +151,9 @@ public class DerrickConfigForm extends DialogWrapper {
         });
     }
 
-    private TextFieldWithBrowseButton createTextFieldWithBrowseButton(String browserTitle, Boolean chooseDir) {
-        LabeledComponent<TextFieldWithBrowseButton> labeledComponent = new LabeledComponent<>();
-        TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener(browserTitle, "", null,
-                new FileChooserDescriptor(!chooseDir, chooseDir, false, false, false, false));
-        return textField;
-    }
-
-    private void initComponents() {
+    private void addImageNameAutoValidateListener(int index) {
         registryComboBox.addActionListener(e -> {
-            String imageName = (String) configTable.getValueAt(0, 1);
+            String imageName = (String) configTable.getValueAt(index, 1);
             if (imageName.equals("")) return;
 
             String[] imageNameArr = imageName.split("/");
@@ -169,9 +166,19 @@ public class DerrickConfigForm extends DialogWrapper {
                 imageName = username + "/" + imageNameArr[1];
             }
 
-            configTable.setValueAt(imageName, 0, 1);
+            configTable.setValueAt(imageName, index, 1);
         });
+    }
 
+    private TextFieldWithBrowseButton createTextFieldWithBrowseButton(String browserTitle, Boolean chooseDir) {
+        LabeledComponent<TextFieldWithBrowseButton> labeledComponent = new LabeledComponent<>();
+        TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
+        textField.addBrowseFolderListener(browserTitle, "", null,
+                new FileChooserDescriptor(!chooseDir, chooseDir, false, false, false, false));
+        return textField;
+    }
+
+    private void initComponents() {
         deploymentYamlTextField = createTextFieldWithBrowseButton("Select deployment YAML", false);
         deploymentYamlPathPanel.setLayout(new BoxLayout(deploymentYamlPathPanel, BoxLayout.X_AXIS));
         deploymentYamlPathPanel.add(deploymentYamlTextField);
