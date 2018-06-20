@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
+import xyz.ihac.intellij.plugin.derrick.ui.model.AliyunCSClusterTableModel;
 import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
 
 import javax.swing.*;

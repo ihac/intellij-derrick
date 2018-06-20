@@ -1,4 +1,6 @@
-package xyz.ihac.intellij.plugin.derrick.ui;
+package xyz.ihac.intellij.plugin.derrick.ui.model;
+
+import xyz.ihac.intellij.plugin.derrick.ui.AliyunCSCluster;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.LinkedList;
@@ -107,6 +109,7 @@ public class AliyunCSClusterTableModel extends AbstractTableModel {
             default:
                 throw new IllegalArgumentException(String.format("Unable to set value at (%d, %d) in AliyunCSCluster Table", rowIndex, columnIndex));
         }
+        fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     public List<AliyunCSCluster> getSelectedCluster() {

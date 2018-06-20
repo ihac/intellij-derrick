@@ -3,54 +3,52 @@ package xyz.ihac.intellij.plugin.derrick.ui;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.LabeledComponent;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.ui.ValidationInfo;
+import com.intellij.openapi.ui.*;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
-import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.derrick.Derrick;
+import xyz.ihac.intellij.plugin.derrick.ui.model.DerrickConfigTableModel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class DerrickConfigForm extends DialogWrapper {
     private JPanel rootPanel;
-    private JTable configTable;
-    private JScrollPane scrollPanel;
+
+    /** Represents the basic configuration for this action */
     private JPanel basicConfigPanel;
-    private JPanel checkBoxPanel;
-    private JPanel pushConfigPanel;
-    private JPanel deployConfigPanel;
-    private JLabel imageNameLabel;
-
+    private JPanel rebuildPanel;
     private JCheckBox reBuildCheckBox;
-
-    private JTextField imageNameTextField;
     private JPanel imageNamePanel;
-    private JComboBox kubernetesClusterComboBox;
+    private JLabel imageNameLabel;
+    private JTextField imageNameTextField;
+    private JPanel registryPanel;
     private JLabel registryLabel;
-
     private JComboBox registryComboBox;
+    private JPanel deployConfigPanel;
     private JLabel kubernetesClusterLabel;
-    private JLabel deploymentYamlLabel;
+    private JComboBox kubernetesClusterComboBox;
     private JPanel deploymentYamlPathPanel;
-    private JComboBox derrickRiggingComboBox;
+    private JLabel deploymentYamlLabel;
+    private TextFieldWithBrowseButton deploymentYamlTextField;
     private JPanel derrickRiggingPanel;
     private JLabel derrickRiggingLabel;
-    private TextFieldWithBrowseButton deploymentYamlTextField;
+    private JComboBox derrickRiggingComboBox;
+
+    /** Represents the configuration required by Derrick */
+    private JPanel derrickConfigPanel;
+    private JBTable derrickConfigTable;
 
     private String action;
 
@@ -62,33 +60,190 @@ public class DerrickConfigForm extends DialogWrapper {
 
         this.action = action;
 
-        scrollPanel.setBorder(BorderFactory.createEmptyBorder());
-        scrollPanel.setVisible(false);
-        pushConfigPanel.setVisible(false);
-        deployConfigPanel.setVisible(false);
-        imageNamePanel.setVisible(false);
-        derrickRiggingPanel.setVisible(false);
-
-        initComponents();
-        initDefaultValue(project);
+        setupComponents(project);
     }
+
     public DerrickConfigForm(@Nullable Project project,
                              String action,
                              Map<String, List<Map<String, String>>> riggingsAndParams) {
         this(project, action);
 
-        initRiggings(riggingsAndParams);
+        addRiggings(riggingsAndParams);
     }
 
-    private void initRiggings(Map<String, List<Map<String, String>>> riggingsAndParams) {
+    private void setupComponents(@Nullable Project project) {
+        /** Sets visibility based on action */
+        if (action.equals("Init")) {
+            rebuildPanel.setVisible(false);
+            imageNamePanel.setVisible(false);
+            deployConfigPanel.setVisible(false);
+        }
+        else if (action.equals("Serve")) {
+            registryPanel.setVisible(false);
+            deployConfigPanel.setVisible(false);
+            derrickRiggingPanel.setVisible(false);
+            derrickConfigPanel.setVisible(false);
+        }
+        else if (action.equals("Push")) {
+            registryPanel.setVisible(false);
+            deployConfigPanel.setVisible(false);
+            derrickRiggingPanel.setVisible(false);
+            derrickConfigPanel.setVisible(false);
+        }
+        else if (action.equals("Deploy")) {
+            rebuildPanel.setVisible(false);
+            imageNamePanel.setVisible(false);
+            registryPanel.setVisible(false);
+            derrickRiggingPanel.setVisible(false);
+            derrickConfigPanel.setVisible(false);
+        }
+
+        DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
+
+        if (deployConfigPanel.isVisible()) {
+            /** Creates a textfield with browse button and sets default value */
+            deploymentYamlTextField = createTextFieldWithBrowseButton("Select deployment YAML", false);
+            deploymentYamlPathPanel.setLayout(new BoxLayout(deploymentYamlPathPanel, BoxLayout.X_AXIS));
+            deploymentYamlPathPanel.add(deploymentYamlTextField);
+            if (project != null) {
+                deploymentYamlTextField.setText(project.getBasePath() + "/" + "kubernetes-deployment.yaml");
+            }
+
+            /** Adds predefined kubernetes clusters */
+            for (K8sClusterConfiguration cluster: option.getK8sClusters()) {
+                kubernetesClusterComboBox.addItem(cluster);
+            }
+        }
+
+        if (rebuildPanel.isVisible()) {
+            /** Adds listener for rebuild image checkbox */
+            addReBuildCheckBoxListener();
+        }
+
+        if (registryPanel.isVisible()) {
+            /** Adds predefined docker registries */
+            for (DockerRegistryConfiguration registry: option.getDockerRegistries()) {
+                registryComboBox.addItem(registry);
+            }
+
+            registryComboBox.addActionListener(e -> {
+                DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
+
+                int imageNameRow = model.getImageNameRow();
+                // only work when 'image name' config is present.
+                if (imageNameRow != -1) {
+                    String imageName = (String) model.getValueAt(imageNameRow, 1);
+                    DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
+
+                    String newName = autoCorrectImageName(imageName, registry);
+                    if (!newName.equals(imageName)) {
+                        model.setValueAt(autoCorrectImageName(imageName, registry),
+                                imageNameRow, 1);
+                    }
+                }
+            });
+        }
+
+        if (derrickConfigPanel.isVisible()) {
+            /** Creates a table for derrick config */
+            derrickConfigTable = new JBTable(new DerrickConfigTableModel());
+
+            derrickConfigTable.addMouseMotionListener(new MouseAdapter(){
+                public void mouseMoved(MouseEvent e) {
+                    int row= derrickConfigTable.rowAtPoint(e.getPoint());
+                    DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
+                    List<Map<String, String>> params = model.getRawParams();
+
+                    if (row > -1 && row < params.size()) {
+                        String description = params.get(row).get("description");
+                        derrickConfigTable.setToolTipText(description);
+                    }
+                    else
+                        derrickConfigTable.setToolTipText(null);
+                }
+            });
+            derrickConfigTable.setCellSelectionEnabled(true);
+            derrickConfigTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+            derrickConfigTable.setStriped(true);
+
+            JBScrollPane scrollPane = new JBScrollPane(derrickConfigTable);
+            scrollPane.setPreferredSize(new Dimension(-1, 150));
+            derrickConfigPanel.setLayout(new BoxLayout(derrickConfigPanel, BoxLayout.Y_AXIS));
+            derrickConfigPanel.add(scrollPane);
+        }
+    }
+
+    private void addRiggings(Map<String, List<Map<String, String>>> riggingsAndParams) {
         derrickRiggingComboBox.addActionListener(e -> {
             String rigging = (String) derrickRiggingComboBox.getSelectedItem();
-            initTable(riggingsAndParams.get(rigging));
+            updateTableContents(riggingsAndParams.get(rigging));
         });
         for (String rigging: riggingsAndParams.keySet()) {
             derrickRiggingComboBox.addItem(rigging);
         }
     }
+
+    private void updateTableContents(List<Map<String, String>> params) {
+        DerrickConfigTableModel model = new DerrickConfigTableModel(params);
+        model.addTableModelListener(e -> {
+            int imageNameRow = model.getImageNameRow();
+            // only work when 'image name' config is present.
+            if (imageNameRow != -1) {
+                System.out.println("output: " + e.getColumn() + ", " + e.getLastRow() + ", " + e.getFirstRow());
+                if (e.getColumn() != 1 || e.getLastRow() != imageNameRow) return;
+
+                String imageName = (String) model.getValueAt(imageNameRow, 1);
+                DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
+
+                String newName = autoCorrectImageName(imageName, registry);
+                if (!newName.equals(imageName)) {
+                    model.setValueAt(autoCorrectImageName(imageName, registry),
+                            imageNameRow, 1);
+                }
+            }
+        });
+        derrickConfigTable.setModel(model);
+    }
+
+    private String autoCorrectImageName(String imageName, DockerRegistryConfiguration registry) {
+        String[] imageNameArr = imageName.split("/");
+
+        String username = registry.getUsername();
+        if (imageNameArr.length < 2) {
+            imageName = username + "/" + imageName;
+        }
+        else {
+            imageName = username + "/" + imageNameArr[1];
+        }
+
+        String[] arr = imageName.split(":");
+        if (arr.length < 2) {
+            imageName += ":latest";
+        }
+        return imageName;
+    }
+
+    private void addReBuildCheckBoxListener() {
+        reBuildCheckBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                imageNameLabel.setEnabled(false);
+                imageNameTextField.setEnabled(false);
+            } else {
+                imageNameLabel.setEnabled(true);
+                imageNameTextField.setEnabled(true);
+            }
+        });
+    }
+
+    private TextFieldWithBrowseButton createTextFieldWithBrowseButton(String browserTitle, Boolean chooseDir) {
+        LabeledComponent<TextFieldWithBrowseButton> labeledComponent = new LabeledComponent<>();
+        TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
+        textField.addBrowseFolderListener(browserTitle, "", null,
+                new FileChooserDescriptor(!chooseDir, chooseDir, false, false, false, false));
+        return textField;
+    }
+
+    ////////// Getters //////////
 
     public Boolean getIsRebuild() {
         return reBuildCheckBox.isSelected();
@@ -98,16 +253,9 @@ public class DerrickConfigForm extends DialogWrapper {
         return (String) derrickRiggingComboBox.getSelectedItem();
     }
 
-    public java.util.Map<String, String> getParams() {
-        java.util.Map<String, String> res = new HashMap<String, String>();
-        DefaultTableModel dtm = (DefaultTableModel) configTable.getModel();
-        int nRow = dtm.getRowCount();
-        for (int i = 0; i < nRow; i++) {
-            String key = (String) dtm.getValueAt(i, 0);
-            String value = (String) dtm.getValueAt(i, 1);
-            res.put(key, value);
-        }
-        return res;
+    public Map<String, String> getParams() {
+        DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
+        return model.getParams();
     }
 
     public String getDeploymentYaml() {
@@ -126,153 +274,6 @@ public class DerrickConfigForm extends DialogWrapper {
         return (K8sClusterConfiguration) kubernetesClusterComboBox.getSelectedItem();
     }
 
-    private void initDefaultValue(Project project) {
-        DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
-        for (DockerRegistryConfiguration registry: option.getDockerRegistries()) {
-            registryComboBox.addItem(registry);
-        }
-        for (K8sClusterConfiguration cluster: option.getK8sClusters()) {
-            kubernetesClusterComboBox.addItem(cluster);
-        }
-
-        deploymentYamlTextField.setText(project.getBasePath() + "/" + "kubernetes-deployment.yaml");
-    }
-
-
-    private void addCheckBoxListener() {
-        reBuildCheckBox.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                imageNameLabel.setEnabled(false);
-                imageNameTextField.setEnabled(false);
-            } else {
-                imageNameLabel.setEnabled(true);
-                imageNameTextField.setEnabled(true);
-            }
-        });
-    }
-
-    private void addImageNameAutoValidateListener(int index) {
-        registryComboBox.addActionListener(e -> {
-            String imageName = (String) configTable.getValueAt(index, 1);
-            if (imageName.equals("")) return;
-
-            String[] imageNameArr = imageName.split("/");
-            DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
-            String username = registry.getUsername();
-
-            if (imageNameArr.length < 2)
-                imageName = username + "/" + imageName;
-            else {
-                imageName = username + "/" + imageNameArr[1];
-            }
-
-            configTable.setValueAt(imageName, index, 1);
-        });
-    }
-
-    private TextFieldWithBrowseButton createTextFieldWithBrowseButton(String browserTitle, Boolean chooseDir) {
-        LabeledComponent<TextFieldWithBrowseButton> labeledComponent = new LabeledComponent<>();
-        TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener(browserTitle, "", null,
-                new FileChooserDescriptor(!chooseDir, chooseDir, false, false, false, false));
-        return textField;
-    }
-
-    private void initComponents() {
-        deploymentYamlTextField = createTextFieldWithBrowseButton("Select deployment YAML", false);
-        deploymentYamlPathPanel.setLayout(new BoxLayout(deploymentYamlPathPanel, BoxLayout.X_AXIS));
-        deploymentYamlPathPanel.add(deploymentYamlTextField);
-
-        basicConfigPanel.setLayout(new BoxLayout(basicConfigPanel, BoxLayout.Y_AXIS));
-        if (action.equals("Init")) {
-            checkBoxPanel.setVisible(false);
-            pushConfigPanel.setVisible(true);
-            derrickRiggingPanel.setVisible(true);
-            scrollPanel.setVisible(true);
-            Dimension preferredSize = rootPanel.getPreferredSize();
-            this.setSize(preferredSize.width, preferredSize.height);
-        }
-        else {
-            addCheckBoxListener();
-            imageNamePanel.setVisible(true);
-//            if (action.equals("Serve"))
-//                serveConfigPanel.setVisible(true);
-            if (action.equals("Push"))
-                pushConfigPanel.setVisible(true);
-            if (action.equals("Deploy")) {
-                checkBoxPanel.setVisible(false);
-                imageNamePanel.setVisible(false);
-                deployConfigPanel.setVisible(true);
-            }
-            Dimension preferredSize = rootPanel.getPreferredSize();
-            this.setSize(preferredSize.width, preferredSize.height);
-        }
-    }
-
-
-    private void initTable(java.util.List<java.util.Map<String, String>> params) {
-        Vector vData = new Vector();
-        Vector vName = new Vector();
-        vName.add("Key");
-        vName.add("Value");
-        for (java.util.Map<String, String> param: params) {
-            String key = param.get("name");
-            String description = param.get("description");
-            String value = param.get("value");
-
-            Vector vRow = new Vector();
-            vRow.add(key);
-            vRow.add(value);
-            vData.add(vRow.clone());
-        }
-
-        DefaultTableModel model = new DefaultTableModel(vData, vName) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column != 0;
-            }
-        };
-        model.addTableModelListener(e -> {
-            if (e.getColumn() != 1 && e.getLastRow() != 0) return;
-            String imageName = configTable.getValueAt(0, 1).toString();
-
-            // validate the format of image name
-            String[] imageNameArr = imageName.split("/");
-            DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
-            String username = registry.getUsername();
-
-            if (imageNameArr.length < 2)
-                imageName = username + "/" + imageName;
-            else {
-                imageName = username + "/" + imageNameArr[1];
-            }
-
-            String[] arr = imageName.split(":");
-            if (arr.length < 2) {
-                imageName += ":latest";
-                configTable.setValueAt(imageName, 0, 1);
-            }
-        });
-        configTable.addMouseMotionListener(new MouseAdapter(){
-            public void mouseMoved(MouseEvent e) {
-                int row=configTable.rowAtPoint(e.getPoint());
-                int col=configTable.columnAtPoint(e.getPoint());
-                if (row>-1 && col==0 && row < params.size()) {
-                    String description = params.get(row).get("description");
-                    configTable.setToolTipText(description);
-                }
-                else
-                    configTable.setToolTipText(null);
-            }
-        });
-        configTable.setModel(model);
-        configTable.setCellSelectionEnabled(true);
-    }
-
-    public JTable getConfigTable() {
-        return configTable;
-    }
-
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
@@ -282,8 +283,8 @@ public class DerrickConfigForm extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if (configTable.isEditing()) {
-            TableCellEditor editor = configTable.getCellEditor();
+        if (derrickConfigTable.isEditing()) {
+            TableCellEditor editor = derrickConfigTable.getCellEditor();
             if (editor != null) {
                 editor.stopCellEditing();
             }
