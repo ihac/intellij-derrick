@@ -2,18 +2,22 @@ package xyz.ihac.intellij.plugin.derrick.action
 
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.wm.ToolWindowManager
 import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}
 import xyz.ihac.intellij.plugin.derrick.core.Flow
+import xyz.ihac.intellij.plugin.derrick.docker.Docker
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
+import xyz.ihac.intellij.plugin.derrick.ui.DerrickConfigForm
+import xyz.ihac.intellij.plugin.derrick.util.ExternalTask
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 
 class ServeAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {
     try {
-      /*
-       * preparation.
-       */
+      /**
+        * Prepares for serve action.
+        */
       val project = e.getProject
       val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
       if (!eventLog.isVisible)
@@ -24,37 +28,51 @@ class ServeAction extends AnAction {
       val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
       val flow = new Flow("Serve", option, projOption)
 
-      /*
-       * generate configuration for serve action.
-       */
-      val config = flow.initConfig(project);
-      if (config == null) {
+      /**
+        * Popups a dialog to generate configurations for this action.
+        * No need to use UITask since it's in Event Dispatch Thread.
+        */
+      val configDialog = new DerrickConfigForm(project, "Serve")
+      configDialog.show()
+      // return if the dialog does not exist with OK.
+      if (configDialog.getExitCode != DialogWrapper.OK_EXIT_CODE) {
         Logger.info("Serve", "serve action cancelled.")
         return
       }
+      val isRebuild = configDialog.getIsRebuild
+      val imageName = configDialog.getImageId
 
-      /*
-       * get image info by either rebuilding a new image or reusing the existing image.
-       */
-      val image =
-        if (config("isRebuild").asInstanceOf[MyBoolean].toBoolean) {
-          val spec = flow.generateSpecs(project, config)
-          val img = flow.buildImage(spec, config)
-          img
+      /**
+        * [External API] Rebuilds image if needed.
+        */
+      val imageRebuildFuture =
+        if (isRebuild) {
+          new ExternalTask(() => {
+            Logger.info("Serve", "start to build image <%s>".format(imageName))
+            val imageId = new Docker(option.getDockerExecPath)
+              .buildImage(projOption.getWorkDir, imageName, true)
+            Logger.info("Serve", "succeed in building image <%s>:<%s>".format(imageName, imageId))
+            imageId
+          }).run
         }
-        else {
-          val Array(name, tag) = config("imageId").toString.split(":")
-          new Image(name, tag, "")
-        }
+        else null
 
-      /*
-       * run container from the image.
-       */
-      val messages = flow.runContainer(image, config) match {
-        case app => "Start container %s from image <%s> successfully".format(app.id, config("imageId"))
-      }
-      Logger.info("Serve", "\t%s".format(messages))
-      Logger.info("Serve", "serve action done.")
+      /**
+        * [External API] Starts container from specified image.
+        */
+      new ExternalTask(() => {
+        // wait for rebuilding image finished.
+        if (imageRebuildFuture != null) {
+          imageRebuildFuture.get()
+        }
+        Logger.info("Serve", "start to run container from image <%s>".format(imageName))
+        val containerId = new Docker(option.getDockerExecPath)
+          .runContainer(imageName)
+        Logger.info("Serve", "succeed in running container <%s>".format(containerId))
+        Logger.info("Serve", "serve action done.")
+        containerId
+      }).run
+
     } catch {
       case e: Exception => Logger.error("Serve", "serve action failed: %s".format(e.getMessage))
       case _ => Logger.error("Serve", "serve action failed due to unknown error(s). Contact author for support.")
