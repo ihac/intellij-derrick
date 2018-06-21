@@ -37,14 +37,16 @@ class InitAction extends AnAction {
           Derrick.get_riggings_and_params(option.getDerrickExecPath, projOption.getWorkDir)
 
         /**
-          * [UI Task] Popups a dialog for generating configuration.
+          * [UI Task] Popups a dialog to generate configurations for this action.
           */
         new UITask(() => {
           val configDialog = new DerrickConfigForm(project, "Init", resp.riggingsAndParamsInJava);
           configDialog.show();
           // return if the dialog does not exist with OK.
-          if (configDialog.getExitCode != DialogWrapper.OK_EXIT_CODE)
+          if (configDialog.getExitCode != DialogWrapper.OK_EXIT_CODE) {
+            Logger.info("Init", "Init action cancelled.")
             return
+          }
 
           /**
             * [External Command] Invokes derrick init.
@@ -57,7 +59,7 @@ class InitAction extends AnAction {
             if (resp.status == "success")
               Logger.info("Init", "init action done.")
             else
-              Logger.info("Init", "init action failed when calling <derrick init>.")
+              Logger.info("Init", "init action failed when calling <derrick init> command: %s".format(resp.message))
           }).run
         }).run
       }).run

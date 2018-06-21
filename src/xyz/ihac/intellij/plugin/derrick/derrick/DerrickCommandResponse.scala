@@ -7,6 +7,7 @@ import scala.collection.JavaConverters._
 abstract class DerrickCommandResponse(output: JsValue) {
   val status = (output \ "status").validate[String].get
   val code = (output \ "code").validate[String].get
+  val message = (output \ "message").validate[String].get
 }
 
 class DerrickInitCommandResponse(output: JsValue) extends DerrickCommandResponse(output) {
