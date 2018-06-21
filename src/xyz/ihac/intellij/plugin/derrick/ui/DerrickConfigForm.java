@@ -282,7 +282,7 @@ public class DerrickConfigForm extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if (derrickConfigTable.isEditing()) {
+        if (action.equals("Init") && derrickConfigTable.isEditing()) {
             TableCellEditor editor = derrickConfigTable.getCellEditor();
             if (editor != null) {
                 editor.stopCellEditing();
