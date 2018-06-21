@@ -189,7 +189,6 @@ public class DerrickConfigForm extends DialogWrapper {
             int imageNameRow = model.getImageNameRow();
             // only work when 'image name' config is present.
             if (imageNameRow != -1) {
-                System.out.println("output: " + e.getColumn() + ", " + e.getLastRow() + ", " + e.getFirstRow());
                 if (e.getColumn() != 1 || e.getLastRow() != imageNameRow) return;
 
                 String imageName = (String) model.getValueAt(imageNameRow, 1);
