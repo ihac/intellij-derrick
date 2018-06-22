@@ -68,5 +68,20 @@ public class DerrickOptionProvider implements PersistentStateComponent<DerrickOp
     public void setDockerRegistries(LinkedList<DockerRegistryConfiguration> registries) {
         this.dockerRegistries = new LinkedList<>(registries);
     }
+
+    /** Finds and returns a predefined registry configuration which matches the input url and username.
+     *
+     * @param url registry url to be matched.
+     * @param username registry username to be matched.
+     * @return docker registry configuration if found, null if not found.
+     */
+    public DockerRegistryConfiguration getRegistryByUrlAndUsername(String url, String username) {
+        for (DockerRegistryConfiguration registry : dockerRegistries) {
+            if (registry.getUrl().equals(url) && registry.getUsername().equals(username)) {
+                return registry;
+            }
+        }
+        return null;
+    }
 }
 
