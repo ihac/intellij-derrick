@@ -12,6 +12,7 @@ import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.derrick.Derrick;
 import xyz.ihac.intellij.plugin.derrick.ui.model.DerrickConfigTableModel;
+import xyz.ihac.intellij.plugin.derrick.util.ImageNameFormat;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
@@ -261,7 +262,7 @@ public class DerrickConfigForm extends DialogWrapper {
         return deploymentYamlTextField.getText();
     }
 
-    public String getImageId() {
+    public String getImageName() {
         return imageNameTextField.getText();
     }
 
@@ -282,10 +283,20 @@ public class DerrickConfigForm extends DialogWrapper {
     @Nullable
     @Override
     protected ValidationInfo doValidate() {
-        if (action.equals("Init") && derrickConfigTable.isEditing()) {
-            TableCellEditor editor = derrickConfigTable.getCellEditor();
-            if (editor != null) {
-                editor.stopCellEditing();
+        if (action.equals("Init")) {
+            if (derrickConfigTable.isEditing()) {
+                TableCellEditor editor = derrickConfigTable.getCellEditor();
+                if (editor != null) {
+                    editor.stopCellEditing();
+                }
+            }
+            DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
+            int row = model.getImageNameRow();
+            if (row >= 0) {
+                String imageName = (String) derrickConfigTable.getValueAt(row, 1);
+                if (!ImageNameFormat.verify(imageName)) {
+                    return new ValidationInfo("Please enter valid image name", derrickConfigTable);
+                }
             }
         }
         return super.doValidate();
