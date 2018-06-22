@@ -13,10 +13,11 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
-import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
-import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
+import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.addon.AliyunCS;
 import xyz.ihac.intellij.plugin.derrick.derrick.Derrick;
+import xyz.ihac.intellij.plugin.derrick.kubernetes.AliyunCSClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.DerrickIcon;
 
 import javax.swing.*;
@@ -226,18 +227,18 @@ public class DerrickSettingsForm {
                             dialog.getAccessKeyID(),
                             dialog.getAccessKeySecret());
 
-                    java.util.List<AliyunCSCluster> allClusters = client.describeClusters();
+                    java.util.List<AliyunCSClusterConfiguration> allClusters = client.describeClusters();
                     dialog = new AliyunCSConfigForm(project, allClusters);
                     dialog.show();
                     if (dialog.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-                        java.util.List<AliyunCSCluster> clusters = dialog.getSelectedClusters();
+                        java.util.List<AliyunCSClusterConfiguration> clusters = dialog.getSelectedClusters();
                         if (clusters.size() != 0) {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
                                     k8sClusterList.setPaintBusy(true);
                                     k8sClusterList.setToolTipText("downloading certificates of your clusters");
-                                    for (AliyunCSCluster cluster : clusters) {
+                                    for (AliyunCSClusterConfiguration cluster : clusters) {
                                         CollectionListModel<K8sClusterConfiguration> model =
                                                 (CollectionListModel<K8sClusterConfiguration>) k8sClusterList.getModel();
 

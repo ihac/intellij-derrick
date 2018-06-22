@@ -6,6 +6,8 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration;
 
 import java.util.LinkedList;
 

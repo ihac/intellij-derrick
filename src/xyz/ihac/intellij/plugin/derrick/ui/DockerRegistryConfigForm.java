@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
-import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.EmailFormat;
 import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
 import xyz.ihac.intellij.plugin.derrick.util.NotEqual;

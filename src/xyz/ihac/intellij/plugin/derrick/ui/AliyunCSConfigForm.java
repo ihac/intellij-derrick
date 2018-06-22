@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
+import xyz.ihac.intellij.plugin.derrick.kubernetes.AliyunCSClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.ui.model.AliyunCSClusterTableModel;
 import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
 
@@ -39,13 +40,13 @@ public class AliyunCSConfigForm extends DialogWrapper {
         initComponent();
     }
 
-    public AliyunCSConfigForm(@Nullable Project project, List<AliyunCSCluster> clusters) {
+    public AliyunCSConfigForm(@Nullable Project project, List<AliyunCSClusterConfiguration> clusters) {
         this(project, true);
 
         initDefaultValue(clusters);
     }
 
-    private void initDefaultValue(List<AliyunCSCluster> clusters) {
+    private void initDefaultValue(List<AliyunCSClusterConfiguration> clusters) {
         AliyunCSClusterTableModel model = new AliyunCSClusterTableModel(clusters);
         clusterTable.setModel(model);
         clusterTable.getColumnModel().getColumn(0).setPreferredWidth(20);
@@ -95,7 +96,7 @@ public class AliyunCSConfigForm extends DialogWrapper {
                 return new ValidationInfo("Please enter valid access key secret", accessKeySecretPasswdField);
         }
         else {
-            for (AliyunCSCluster cluster : getSelectedClusters()) {
+            for (AliyunCSClusterConfiguration cluster : getSelectedClusters()) {
                 if (!NonEmpty.verify(cluster.name()))
                     return new ValidationInfo("Please enter valid name for selected clusters");
             }
@@ -115,7 +116,7 @@ public class AliyunCSConfigForm extends DialogWrapper {
         return String.valueOf(accessKeySecretPasswdField.getPassword()).trim();
     }
 
-    public List<AliyunCSCluster> getSelectedClusters() {
+    public List<AliyunCSClusterConfiguration> getSelectedClusters() {
         AliyunCSClusterTableModel model = (AliyunCSClusterTableModel) clusterTable.getModel();
         return model.getSelectedCluster();
     }

@@ -8,14 +8,12 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
-import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration;
-import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
-import xyz.ihac.intellij.plugin.derrick.derrick.Derrick;
+import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration;
+import xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.ui.model.DerrickConfigTableModel;
 import xyz.ihac.intellij.plugin.derrick.util.ImageNameFormat;
 
 import javax.swing.*;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ItemEvent;

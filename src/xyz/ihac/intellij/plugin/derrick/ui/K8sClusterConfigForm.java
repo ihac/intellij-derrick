@@ -9,15 +9,15 @@ import com.intellij.openapi.ui.ValidationInfo;
 import org.jetbrains.annotations.Nullable;
 import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.DerrickProjectOptionProvider;
-import xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration;
+import xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.util.NonEmpty;
 import xyz.ihac.intellij.plugin.derrick.util.NotEqual;
 
 import javax.swing.*;
 import java.io.File;
 
-import static xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration.ALIYUN_CS_CLUSTER;
-import static xyz.ihac.intellij.plugin.derrick.K8sClusterConfiguration.STANDARD_K8S_CLUSTER;
+import static xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration.ALIYUN_CS_CLUSTER;
+import static xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration.STANDARD_K8S_CLUSTER;
 
 public class K8sClusterConfigForm extends DialogWrapper {
     private JPanel rootPanel;

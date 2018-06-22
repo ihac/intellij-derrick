@@ -1,4 +1,4 @@
-package xyz.ihac.intellij.plugin.derrick;
+package xyz.ihac.intellij.plugin.derrick.docker;
 
 import java.io.Serializable;
 

@@ -4,7 +4,7 @@ import com.aliyuncs.http.MethodType
 import com.aliyuncs.profile.DefaultProfile
 import com.aliyuncs.{CommonRequest, DefaultAcsClient}
 import play.api.libs.json.{JsObject, Json}
-import xyz.ihac.intellij.plugin.derrick.ui.AliyunCSCluster
+import xyz.ihac.intellij.plugin.derrick.kubernetes.AliyunCSClusterConfiguration
 
 import scala.collection.JavaConverters._
 
@@ -41,7 +41,7 @@ class AliyunCS(val region: String,
     raw_call(meth, url)
   }
 
-  def describeClusters(): java.util.List[AliyunCSCluster] = {
+  def describeClusters(): java.util.List[AliyunCSClusterConfiguration] = {
     val res = raw_call(MethodType.GET, "/clusters")
     try {
       Json.parse(res).validate[List[JsObject]].get.map {
@@ -54,7 +54,7 @@ class AliyunCS(val region: String,
               if ((o \ "OutputKey").validate[String].get != "APIServerInternet") url
               else (o \ "OutputValue").validate[String].get
           }
-          new AliyunCSCluster(name, id, ctype, masterUrl)
+          new AliyunCSClusterConfiguration(name, id, ctype, masterUrl)
         }
       }.asJava
     } catch {

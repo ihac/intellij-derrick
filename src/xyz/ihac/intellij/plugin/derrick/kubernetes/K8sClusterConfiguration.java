@@ -1,4 +1,4 @@
-package xyz.ihac.intellij.plugin.derrick;
+package xyz.ihac.intellij.plugin.derrick.kubernetes;
 
 import java.io.Serializable;
 
