@@ -1,10 +1,9 @@
-package xyz.ihac.intellij.plugin.derrick.addon
+package xyz.ihac.intellij.plugin.derrick.kubernetes
 
 import com.aliyuncs.http.MethodType
 import com.aliyuncs.profile.DefaultProfile
 import com.aliyuncs.{CommonRequest, DefaultAcsClient}
 import play.api.libs.json.{JsObject, Json}
-import xyz.ihac.intellij.plugin.derrick.kubernetes.AliyunCSClusterConfiguration
 
 import scala.collection.JavaConverters._
 

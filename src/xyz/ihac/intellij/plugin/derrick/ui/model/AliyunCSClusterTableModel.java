@@ -1,5 +1,7 @@
 package xyz.ihac.intellij.plugin.derrick.ui.model;
 
+import xyz.ihac.intellij.plugin.derrick.kubernetes.AliyunCSClusterConfiguration;
+
 import javax.swing.table.AbstractTableModel;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,11 +19,11 @@ public class AliyunCSClusterTableModel extends AbstractTableModel {
             String.class,
             String.class
     };
-    private class AliyunCSClusterConfiguration {
+    private class AliyunCSClusterConfigurationItem {
         private Boolean isSelected;
         private AliyunCSClusterConfiguration cluster;
 
-        public AliyunCSClusterConfiguration(AliyunCSClusterConfiguration cluster, Boolean isSelected) {
+        public AliyunCSClusterConfigurationItem(AliyunCSClusterConfiguration cluster, Boolean isSelected) {
             this.isSelected = isSelected;
             this.cluster = cluster;
         }
@@ -42,13 +44,13 @@ public class AliyunCSClusterTableModel extends AbstractTableModel {
             this.cluster = cluster;
         }
     }
-    private List<AliyunCSClusterConfiguration> clusterConfigurations = new LinkedList<AliyunCSClusterConfiguration>();
+    private List<AliyunCSClusterConfigurationItem> clusterConfigurations = new LinkedList<AliyunCSClusterConfigurationItem>();
 
     public AliyunCSClusterTableModel(List<AliyunCSClusterConfiguration> clusters) {
         for (AliyunCSClusterConfiguration cluster : clusters) {
             // only support kubernetes for now.
             if (cluster.ctype().equals("Kubernetes"))
-                clusterConfigurations.add(new AliyunCSClusterConfiguration(cluster, false));
+                clusterConfigurations.add(new AliyunCSClusterConfigurationItem(cluster, false));
         }
     }
 
@@ -80,7 +82,7 @@ public class AliyunCSClusterTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        AliyunCSClusterConfiguration config = clusterConfigurations.get(rowIndex);
+        AliyunCSClusterConfigurationItem config = clusterConfigurations.get(rowIndex);
         AliyunCSClusterConfiguration cluster = config.getCluster();
         switch (columnIndex) {
             case 0: return config.isSelected();
@@ -94,7 +96,7 @@ public class AliyunCSClusterTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        AliyunCSClusterConfiguration config = clusterConfigurations.get(rowIndex);
+        AliyunCSClusterConfigurationItem config = clusterConfigurations.get(rowIndex);
         AliyunCSClusterConfiguration cluster = config.getCluster();
         switch (columnIndex) {
             case 0: config.setSelected((Boolean) aValue); break;
@@ -112,7 +114,7 @@ public class AliyunCSClusterTableModel extends AbstractTableModel {
 
     public List<AliyunCSClusterConfiguration> getSelectedCluster() {
         LinkedList<AliyunCSClusterConfiguration> result = new LinkedList<>();
-        for (AliyunCSClusterConfiguration config: clusterConfigurations) {
+        for (AliyunCSClusterConfigurationItem config: clusterConfigurations) {
             if (config.isSelected()) {
                 result.add(config.getCluster());
             }
