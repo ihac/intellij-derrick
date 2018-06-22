@@ -26,7 +26,6 @@ class ServeAction extends AnAction {
 
       val option = ServiceManager.getService(classOf[DerrickOptionProvider])
       val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
-      val flow = new Flow("Serve", option, projOption)
 
       /**
         * Popups a dialog to generate configurations for this action.
@@ -40,7 +39,7 @@ class ServeAction extends AnAction {
         return
       }
       val isRebuild = configDialog.getIsRebuild
-      val imageName = configDialog.getImageId
+      val imageName = configDialog.getImageName
 
       /**
         * [External API] Rebuilds image if needed.

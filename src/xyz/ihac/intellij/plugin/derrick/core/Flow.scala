@@ -156,8 +156,7 @@ class Flow(val action: String, val option: DerrickOptionProvider, val projOption
       dockerClient.buildImageCmd(dir).withTags(Set(imageName).asJava).exec(callback);
 
       Logger.info(action, "succeed to build image.")
-      val Array(name, tag) = imageName.split(":")
-      new Image(name, tag, "")
+      new Image(imageName, "")
     } catch {
       case e: IllegalArgumentException => {
         Logger.error(action, "Dockerfile does not exist.<br> You may call init first or change your work directory.</html>")
@@ -181,9 +180,9 @@ class Flow(val action: String, val option: DerrickOptionProvider, val projOption
     else {
       val (isRebuild, imageId, deploymentYaml, rigging, rawParams, registry, cluster) = action match {
         case "Init" => (null, null, null, configDialog.getRigging, configDialog.getParams.asScala, null, null)
-        case "Serve" => (configDialog.getIsRebuild, configDialog.getImageId, null, null, null, null, null)
-        case "Push" => (configDialog.getIsRebuild, configDialog.getImageId, null, null, null, configDialog.getDockerRegistry, null)
-        case "Deploy" => (configDialog.getIsRebuild, configDialog.getImageId, configDialog.getDeploymentYaml, null, null, null, configDialog.getK8sCluster)
+        case "Serve" => (configDialog.getIsRebuild, configDialog.getImageName, null, null, null, null, null)
+        case "Push" => (configDialog.getIsRebuild, configDialog.getImageName, null, null, null, configDialog.getDockerRegistry, null)
+        case "Deploy" => (configDialog.getIsRebuild, configDialog.getImageName, configDialog.getDeploymentYaml, null, null, null, configDialog.getK8sCluster)
       }
 
       val params =
