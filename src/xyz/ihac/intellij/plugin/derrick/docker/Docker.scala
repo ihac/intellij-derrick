@@ -2,22 +2,54 @@ package xyz.ihac.intellij.plugin.derrick.docker
 
 import java.io.File
 
-import com.github.dockerjava.api.model.BuildResponseItem
-import com.github.dockerjava.core.command.BuildImageResultCallback
+import com.github.dockerjava.api.model.{BuildResponseItem, PushResponseItem}
+import com.github.dockerjava.core.command.{BuildImageResultCallback, PushImageResultCallback}
 import com.github.dockerjava.core.{DefaultDockerClientConfig, DockerClientBuilder}
+import xyz.ihac.intellij.plugin.derrick.DockerRegistryConfiguration
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
+import xyz.ihac.intellij.plugin.derrick.ui.DockerRegistryConfigForm
 
 import scala.collection.JavaConverters._
+
+// TODO: Throw exception
 
 /** Implements Docker wrapper library by invoking SDK API.
   *
   * @param unixSock path to unix socket.
   *                 "unix:///var/run/docker.sock" by default.
+  * @param registry configuration of a registry.
   */
-class Docker(unixSock: String) {
-  val config = DefaultDockerClientConfig.createDefaultConfigBuilder
-    .withDockerHost(unixSock)
+class Docker(unixSock: String, registry: DockerRegistryConfiguration) {
+  val config = {
+    val initConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
+      .withDockerHost(unixSock)
+    if (registry != null)
+      initConfig.withRegistryUrl(registry.getUrl)
+        .withRegistryUsername(registry.getUsername)
+        .withRegistryPassword(registry.getPassword)
+        .withRegistryEmail(registry.getEmail)
+    else
+      initConfig
+  }
   val client = DockerClientBuilder.getInstance(config).build
+
+  def this(unixSock: String) = {
+    this(unixSock, null)
+  }
+
+  def this(unixSock: String,
+           registryUrl: String,
+           registryUsername: String,
+           registryPassword: String,
+           registryEmail: String) = {
+    this(unixSock, new DockerRegistryConfiguration(
+      "",
+      registryUrl,
+      registryUsername,
+      registryPassword,
+      registryEmail
+    ))
+  }
 
   /** Builds image from Dockerfile.
     *
@@ -53,5 +85,21 @@ class Docker(unixSock: String) {
     val response = client.createContainerCmd(imageName).exec()
     client.startContainerCmd(response.getId).exec()
     response.getId
+  }
+
+  /** Pushs image to remote registry.
+    *
+    * @param imageName name of the image to push
+    */
+  def pushImage(imageName: String, logging: Boolean): Unit = {
+    val callback =
+      if (logging) new PushImageResultCallback {
+        override def onNext(item: PushResponseItem): Unit = {
+          super.onNext(item)
+          Logger.info("PushImage", "[Docker] %s".format(item.getProgressDetail))
+        }
+      }
+      else new PushImageResultCallback
+    client.pushImageCmd(imageName).exec(callback).awaitSuccess()
   }
 }
