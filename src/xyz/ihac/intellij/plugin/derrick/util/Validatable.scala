@@ -18,7 +18,7 @@ object NotEqual {
 
 object UrlFormat extends Validatable[String] {
   override def verify(e: String): Boolean = {
-    val url = raw"\w+(\.\w+)+".r
+    val url = raw"\w+(\.\w+)+(:\d+)?".r
     e match {
       case url(_*) => true
       case _ => false
