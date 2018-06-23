@@ -37,7 +37,7 @@ object EmailFormat extends Validatable[String] {
 
 object ImageNameFormat extends Validatable[String] {
   override def verify(e: String): Boolean = {
-    val image = raw"(([^/]+)/)?(\w+)/(\w+):(\w+)".r
+    val image = raw"(([^/]+)/)?(\w+)/([-a-z0-9]+):([a-zA-Z0-9.]+)".r
     e match {
       case image(prefix, url, _, _, _) => prefix == null || UrlFormat.verify(url)
       case _ => false
