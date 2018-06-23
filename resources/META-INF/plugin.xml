@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>xyz.ihac.derrick</id>
   <name>Derrick</name>
-  <version>0.2.0-alpha</version>
+  <version>0.2.1-beta</version>
   <vendor email="hac@zju.edu.cn" url="https://github.com/ihac/intellij-derrick">Xiao An</vendor>
 
   <description><![CDATA[
@@ -28,18 +28,25 @@
 
   <p>
     <ul>
-      <li><strong>Important Note:</strong> You can report exception-issues directly from your IDE. Please
+      <li><strong>Important Note:</strong> You can report exception-issues in the Github repository of this plugin. Please
       add at least a comment what you have done when it occurred / how you can reproduce it. It would be even better
       when add an email address so I can contact you in case of questions.</li>
 
-      <li>0.2.0.alpha</li>
+      <li>0.2.1-beta</li>
+        <ul>
+          <li>Optimize performance by multi-thread programming</li>
+          <li>More and better user input validation</li>
+          <li>Better UI experience (NoScroll in settings dialog, better-looking table form and so on)</li>
+        </ul>
+
+      <li>0.2.0-alpha</li>
         <ul>
           <li>Support Aliyun Container Service</li>
           <li>Add user input validation</li>
           <li>Fix the size of registry/cluster list window</li>
         </ul>
 
-      <li>0.1.0.alpha</li>
+      <li>0.1.0-alpha</li>
         <ul>
           <li>Add four basic actions: Init, Serve, Push and Deploy</li>
           <li>Support multi Docker registries and multi Kubernetes clusters</li>
