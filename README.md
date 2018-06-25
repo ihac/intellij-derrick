@@ -21,6 +21,21 @@ You can install this plugin in two different ways:
 
    Click `Releases`; Select and download the plugin file in required version; Install the plugin from disk (refer to [official docs](https://www.jetbrains.com/help/idea/installing-plugin-from-disk.html)).
 
+## User Guide
+
+**Note:** Please make sure the toolbar is visible by checking `View->Toolbar`.
+
+Users should configure the plugin first before using it: Open Settings/Preferences dialog, and click `Derrick` in the Tools group. Set the path to derrick executable file and add your own Docker registries and Kubernetes clusters.
+
+There are 4 main actions provided by this plugin: Init, Serve, Push and Deploy.
+
+- Init: Automatically detect application source code and generate Dockerfile, Kubernetes-Yaml by leveraging derrick.
+- Serve: Build Docker image from Dockerfile and run as container.
+- Push: Push Docker image to remote registry.
+- Deploy: Deploy application to remote Kubernetes cluster.
+
+Users are able to select one of these actions by clicking the derrick icon in IntelliJ IDEA toolbar.
+
 ## Plugin Versioning Specs
 
 Refer to [Semantic Versioning 2.0.0](https://semver.org/)
