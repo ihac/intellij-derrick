@@ -74,7 +74,6 @@ class ServeAction extends AnAction {
 
     } catch {
       case e: Exception => Logger.error("Serve", "serve action failed: %s".format(e.getMessage))
-      case _ => Logger.error("Serve", "serve action failed due to unknown error(s). Contact author for support.")
     }
   }
 }

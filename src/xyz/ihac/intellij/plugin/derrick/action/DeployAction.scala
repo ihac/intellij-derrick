@@ -57,7 +57,6 @@ class DeployAction extends AnAction {
 
     } catch {
       case e: Exception => Logger.error("Deploy", "deploy action failed: %s".format(e.getMessage))
-      case _ => Logger.error("Deploy", "deploy action failed due to unknown error(s). Contact author for support.")
     }
   }
 }

@@ -80,7 +80,6 @@ class PushAction extends AnAction {
 
     } catch {
       case e: Exception => Logger.error("Push", "push action failed: %s".format(e.getMessage))
-      case _ => Logger.error("Push", "push action failed due to unknown error(s). Contact author for support.")
     }
   }
 }

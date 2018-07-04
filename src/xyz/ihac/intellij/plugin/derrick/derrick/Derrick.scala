@@ -44,7 +44,7 @@ object Derrick {
       (res \ "version").validate[String].isSuccess
     }
     catch {
-      case e => false
+      case e: Exception => false
     }
   }
 }

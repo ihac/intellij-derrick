@@ -66,7 +66,6 @@ class InitAction extends AnAction {
 
     } catch {
       case e: Exception => Logger.error("Init", "init action failed: %s.".format(e.getMessage));
-      case _ => Logger.error("Init", "init action failed due to unknown error(s). Contact author for support.")
     }
   }
 }
