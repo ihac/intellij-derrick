@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.wm.ToolWindowManager
-import xyz.ihac.intellij.plugin.derrick.core.Flow
 import xyz.ihac.intellij.plugin.derrick.kubernetes.{K8sClusterConfiguration, Kubernetes}
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 import xyz.ihac.intellij.plugin.derrick.ui.DerrickConfigForm
