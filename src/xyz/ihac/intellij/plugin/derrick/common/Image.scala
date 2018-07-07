@@ -1,6 +1,6 @@
 package xyz.ihac.intellij.plugin.derrick.common
 
-import xyz.ihac.intellij.plugin.derrick.util.ImageNameFormat
+import scala.language.implicitConversions
 
 class Image(rawName: String, val uuid: String) {
   val (url, username, name, tag) = {
