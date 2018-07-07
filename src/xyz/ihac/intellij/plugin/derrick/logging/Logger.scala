@@ -4,43 +4,34 @@ import com.intellij.icons.AllIcons
 import com.intellij.notification._
 
 object Logger {
-  Notifications.Bus.register("Derrick", NotificationDisplayType.NONE)
+  val logger = new NotificationGroup("Derrick", NotificationDisplayType.NONE, true)
 
   def info(action: String, message: String): Unit = {
-    val notification = new Notification(
-      "Derrick",
-      AllIcons.General.Run,
+    val notification = logger.createNotification(
       "Derrick",
       action,
       message,
-      NotificationType.INFORMATION,
-      NotificationListener.URL_OPENING_LISTENER
+      NotificationType.INFORMATION
     )
     Notifications.Bus.notify(notification)
   }
 
   def warn(action: String, message: String): Unit = {
-    val notification = new Notification(
-      "Derrick",
-      AllIcons.General.Run,
+    val notification = logger.createNotification(
       "Derrick",
       action,
       message,
-      NotificationType.WARNING,
-      null
+      NotificationType.WARNING
     )
     Notifications.Bus.notify(notification)
   }
 
   def error(action: String, message: String): Unit = {
-    val notification = new Notification(
-      "Derrick",
-      AllIcons.General.Run,
+    val notification = logger.createNotification(
       "Derrick",
       action,
       message,
-      NotificationType.ERROR,
-      null
+      NotificationType.ERROR
     )
     Notifications.Bus.notify(notification)
   }
