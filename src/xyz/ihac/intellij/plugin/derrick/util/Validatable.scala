@@ -1,5 +1,7 @@
 package xyz.ihac.intellij.plugin.derrick.util
 
+import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration
+
 trait Validatable[T] {
   def verify(e: T): Boolean
 }
@@ -43,4 +45,20 @@ object ImageNameFormat extends Validatable[String] {
       case _ => false
     }
   }
+}
+
+class ImageNameMatchRegistry(val registry: DockerRegistryConfiguration) extends Validatable[String] {
+  override def verify(e: String): Boolean = {
+    val image = raw"(([^/]+)/)?(\w+)/([-a-z0-9]+):([a-zA-Z0-9.]+)".r
+    e match {
+      case image(prefix, url, user, name, tag) =>
+        user == registry.getUsername &&
+          (prefix == null || url == registry.getUrl)
+      case _ => false
+    }
+  }
+}
+
+object ImageNameMatchRegistry {
+  def apply(registry: DockerRegistryConfiguration): ImageNameMatchRegistry = new ImageNameMatchRegistry(registry)
 }

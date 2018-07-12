@@ -11,7 +11,7 @@ import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.ui.model.DerrickConfigTableModel;
-import xyz.ihac.intellij.plugin.derrick.util.ImageNameFormat;
+import xyz.ihac.intellij.plugin.derrick.util.ImageNameMatchRegistry;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -124,23 +124,6 @@ public class DerrickConfigForm extends DialogWrapper {
             for (DockerRegistryConfiguration registry: option.getDockerRegistries()) {
                 registryComboBox.addItem(registry);
             }
-
-            registryComboBox.addActionListener(e -> {
-                DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
-
-                int imageNameRow = model.getImageNameRow();
-                // only work when 'image name' config is present.
-                if (imageNameRow != -1) {
-                    String imageName = (String) model.getValueAt(imageNameRow, 1);
-                    DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
-
-                    String newName = autoCorrectImageName(imageName, registry);
-                    if (!newName.equals(imageName)) {
-                        model.setValueAt(autoCorrectImageName(imageName, registry),
-                                imageNameRow, 1);
-                    }
-                }
-            });
         }
 
         if (derrickConfigPanel.isVisible()) {
@@ -184,41 +167,7 @@ public class DerrickConfigForm extends DialogWrapper {
 
     private void updateTableContents(List<Map<String, String>> params) {
         DerrickConfigTableModel model = new DerrickConfigTableModel(params);
-        model.addTableModelListener(e -> {
-            int imageNameRow = model.getImageNameRow();
-            // only work when 'image name' config is present.
-            if (imageNameRow != -1) {
-                if (e.getColumn() != 1 || e.getLastRow() != imageNameRow) return;
-
-                String imageName = (String) model.getValueAt(imageNameRow, 1);
-                DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
-
-                String newName = autoCorrectImageName(imageName, registry);
-                if (!newName.equals(imageName)) {
-                    model.setValueAt(autoCorrectImageName(imageName, registry),
-                            imageNameRow, 1);
-                }
-            }
-        });
         derrickConfigTable.setModel(model);
-    }
-
-    private String autoCorrectImageName(String imageName, DockerRegistryConfiguration registry) {
-        String[] imageNameArr = imageName.split("/");
-
-        String username = registry.getUsername();
-        if (imageNameArr.length < 2) {
-            imageName = username + "/" + imageName;
-        }
-        else {
-            imageName = username + "/" + imageNameArr[1];
-        }
-
-        String[] arr = imageName.split(":");
-        if (arr.length < 2) {
-            imageName += ":latest";
-        }
-        return imageName;
     }
 
     private void addReBuildCheckBoxListener() {
@@ -282,18 +231,13 @@ public class DerrickConfigForm extends DialogWrapper {
     @Override
     protected ValidationInfo doValidate() {
         if (action.equals("Init")) {
-            if (derrickConfigTable.isEditing()) {
-                TableCellEditor editor = derrickConfigTable.getCellEditor();
-                if (editor != null) {
-                    editor.stopCellEditing();
-                }
-            }
             DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
             int row = model.getImageNameRow();
             if (row >= 0) {
                 String imageName = (String) derrickConfigTable.getValueAt(row, 1);
-                if (!ImageNameFormat.verify(imageName)) {
-                    return new ValidationInfo("Please enter valid image name", derrickConfigTable);
+                DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
+                if (!ImageNameMatchRegistry.apply(registry).verify(imageName)) {
+                    return new ValidationInfo("Please enter valid image name");
                 }
             }
         }
