@@ -1,5 +1,6 @@
 package xyz.ihac.intellij.plugin.derrick.action
 
+import com.intellij.execution.ExecutionException
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.application.{ApplicationManager, ModalityState}
 import com.intellij.openapi.components.ServiceManager
@@ -15,25 +16,30 @@ import scala.collection.JavaConverters._
 
 class InitAction extends AnAction {
   override def actionPerformed(e: AnActionEvent): Unit = {
-    try {
-      /**
-        * Prepares for init action.
-        */
-      val project = e.getProject
-      val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
-      if (!eventLog.isVisible)
-        eventLog.show(null)
-      Logger.info("Init", "init action start...")
+    /**
+      * Prepares for init action.
+      */
+    val project = e.getProject
+    val eventLog = ToolWindowManager.getInstance(project).getToolWindow("Event Log")
+    if (!eventLog.isVisible)
+      eventLog.show(null)
+    Logger.info("Init", "init action start...")
 
-      val option = ServiceManager.getService(classOf[DerrickOptionProvider])
-      val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
+    val option = ServiceManager.getService(classOf[DerrickOptionProvider])
+    val projOption = ServiceManager.getService(project, classOf[DerrickProjectOptionProvider])
 
-      /**
-        * [External Command] Gets riggings and params from derrick.
-        */
-      new ExternalTask(() => {
+    /**
+      * [External Command] Gets riggings and params from derrick.
+      */
+    new ExternalTask(() => {
+      try {
         val resp =
           Derrick.get_riggings_and_params(option.getDerrickExecPath, projOption.getWorkDir)
+        // no parameter is needed for derrick init.
+        if (resp.status == "success") {
+          Logger.info("Init", "init action done.")
+          return
+        }
 
         /**
           * [UI Task] Popups a dialog to generate configurations for this action.
@@ -51,20 +57,29 @@ class InitAction extends AnAction {
             * [External Command] Invokes derrick init.
             */
           new ExternalTask(() => {
-            val (rigging, params) =
-              (configDialog.getRigging, configDialog.getParams)
-            val derrick = new Derrick(option.getDerrickExecPath, projOption.getWorkDir)
-            val resp = derrick.init(rigging, params.asScala.toMap)
-            if (resp.status == "success")
-              Logger.info("Init", "init action done.")
-            else
-              Logger.info("Init", "init action failed when calling <derrick init> command: %s".format(resp.message))
+            try {
+              val (rigging, params) =
+                (configDialog.getRigging, configDialog.getParams)
+              val derrick = new Derrick(option.getDerrickExecPath, projOption.getWorkDir)
+              val resp = derrick.init(rigging, params.asScala.toMap)
+              if (resp.status == "success")
+                Logger.info("Init", "init action done.")
+              else
+                Logger.info("Init", "init action failed when calling <derrick init> command: %s".format(resp.message))
+            } catch {
+              case e: Exception => {
+                Logger.error("Init", "error in invoking derrick init with user-defined parameters: " + e.getMessage)
+                Logger.info("Init", "init action failed.")
+              }
+            }
           }).run
         }).run
-      }).run
-
-    } catch {
-      case e: Exception => Logger.error("Init", "init action failed: %s.".format(e.getMessage));
-    }
+      } catch {
+        case e: Exception => {
+          Logger.error("Init", "error in getting riggings and params from derrick: " + e.getMessage)
+          Logger.info("Init", "init action failed.")
+        }
+      }
+    }).run
   }
 }
