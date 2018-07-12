@@ -39,11 +39,6 @@ class PushAction extends AnAction {
     val isRebuild = configDialog.getIsRebuild
     val imageName = configDialog.getImageName
 
-    if (!ImageNameFormat.verify(imageName)) {
-      Logger.error("Push", "image name cannot be recognized: %s".format(imageName))
-      Logger.info("Push", "push action failed.")
-      return
-    }
     import Image._
     val registry = option.getRegistryByUrlAndUsername(imageName.url, imageName.username)
     if (registry == null) {

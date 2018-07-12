@@ -11,6 +11,7 @@ import xyz.ihac.intellij.plugin.derrick.DerrickOptionProvider;
 import xyz.ihac.intellij.plugin.derrick.docker.DockerRegistryConfiguration;
 import xyz.ihac.intellij.plugin.derrick.kubernetes.K8sClusterConfiguration;
 import xyz.ihac.intellij.plugin.derrick.ui.model.DerrickConfigTableModel;
+import xyz.ihac.intellij.plugin.derrick.util.ImageNameFormat;
 import xyz.ihac.intellij.plugin.derrick.util.ImageNameMatchRegistry;
 
 import javax.swing.*;
@@ -239,6 +240,11 @@ public class DerrickConfigForm extends DialogWrapper {
                 if (!ImageNameMatchRegistry.apply(registry).verify(imageName)) {
                     return new ValidationInfo("Please enter valid image name");
                 }
+            }
+        }
+        else if (action.equals("Serve") || action.equals("Push")) {
+            if (!ImageNameFormat.verify(getImageName())) {
+                return new ValidationInfo("Please enter valid image name", imageNameTextField);
             }
         }
         return super.doValidate();

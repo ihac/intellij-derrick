@@ -116,7 +116,7 @@ public class K8sClusterConfigForm extends DialogWrapper {
         // TODO: Clusters which are not applied should be considered.
         DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
         for (K8sClusterConfiguration cluster: option.getK8sClusters()) {
-            if (!NotEqual.set(cluster.getName()).verify(getClusterName()))
+            if (!NotEqual.apply(cluster.getName()).verify(getClusterName()))
                 return new ValidationInfo("Cluster name conflicts with existing clusters", k8sNameTextField);
         }
 

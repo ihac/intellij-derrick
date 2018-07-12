@@ -15,7 +15,7 @@ class NotEqual(val m: String) extends Validatable[String] {
 }
 
 object NotEqual {
-  def set(m: String): NotEqual = new NotEqual(m)
+  def apply(m: String): NotEqual = new NotEqual(m)
 }
 
 object UrlFormat extends Validatable[String] {

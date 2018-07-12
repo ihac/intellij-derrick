@@ -99,7 +99,7 @@ public class DockerRegistryConfigForm extends DialogWrapper {
         // TODO: Registries which are not applied should be considered.
         DerrickOptionProvider option = ServiceManager.getService(DerrickOptionProvider.class);
         for (DockerRegistryConfiguration registry: option.getDockerRegistries()) {
-            if (!NotEqual.set(registry.getName()).verify(getName()))
+            if (!NotEqual.apply(registry.getName()).verify(getName()))
                 return new ValidationInfo("Registry name conflicts with existing registries", registryNameTextField);
         }
         return super.doValidate();
