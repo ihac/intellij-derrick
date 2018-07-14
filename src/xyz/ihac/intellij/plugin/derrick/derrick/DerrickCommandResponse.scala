@@ -1,7 +1,9 @@
 package xyz.ihac.intellij.plugin.derrick.derrick
 
+import java.util.{List => jList, Map => jMap}
+
 import play.api.libs.json.{JsObject, JsValue}
-import java.util.{Map => jMap, List => jList}
+
 import scala.collection.JavaConverters._
 
 abstract class DerrickCommandResponse(output: JsValue) {

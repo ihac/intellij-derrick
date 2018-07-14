@@ -6,7 +6,6 @@ import com.github.dockerjava.api.model.{BuildResponseItem, PushResponseItem}
 import com.github.dockerjava.core.command.{BuildImageResultCallback, PushImageResultCallback}
 import com.github.dockerjava.core.{DefaultDockerClientConfig, DockerClientBuilder}
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
-import xyz.ihac.intellij.plugin.derrick.ui.DockerRegistryConfigForm
 
 import scala.collection.JavaConverters._
 

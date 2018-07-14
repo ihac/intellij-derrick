@@ -2,8 +2,7 @@ package xyz.ihac.intellij.plugin.derrick.derrick
 
 import java.nio.file.Paths
 
-import com.intellij.execution.ExecutionException
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import xyz.ihac.intellij.plugin.derrick.util.Command
 
 class Derrick(val path: String, val workDir: String) {

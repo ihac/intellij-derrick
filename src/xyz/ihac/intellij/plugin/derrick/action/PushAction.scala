@@ -4,11 +4,11 @@ import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.wm.ToolWindowManager
-import xyz.ihac.intellij.plugin.derrick.common.{Image, MyBoolean}
+import xyz.ihac.intellij.plugin.derrick.common.Image
 import xyz.ihac.intellij.plugin.derrick.docker.Docker
 import xyz.ihac.intellij.plugin.derrick.logging.Logger
 import xyz.ihac.intellij.plugin.derrick.ui.DerrickConfigForm
-import xyz.ihac.intellij.plugin.derrick.util.{ExternalTask, ImageNameFormat}
+import xyz.ihac.intellij.plugin.derrick.util.ExternalTask
 import xyz.ihac.intellij.plugin.derrick.{DerrickOptionProvider, DerrickProjectOptionProvider}
 
 class PushAction extends AnAction {

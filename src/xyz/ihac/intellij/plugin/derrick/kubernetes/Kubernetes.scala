@@ -1,6 +1,6 @@
 package xyz.ihac.intellij.plugin.derrick.kubernetes
 
-import java.io.{FileReader, Reader, StringReader}
+import java.io.{FileReader, StringReader}
 
 import io.kubernetes.client.Configuration
 import io.kubernetes.client.apis.{CoreV1Api, ExtensionsV1beta1Api}

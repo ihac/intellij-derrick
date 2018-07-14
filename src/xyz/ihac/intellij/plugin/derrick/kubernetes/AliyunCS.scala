@@ -63,8 +63,8 @@ class AliyunCS(val region: String,
   }
 
   def describeClusterKubeConfig(clusterId: String): String = {
-    // TODO: best practice when using assert?
-    assert(clusterId != null && clusterId != "")
+    // TODO: any best practice when using require?
+    require(clusterId != null && clusterId != "")
     val res = raw_call(MethodType.GET, "/k8s/%s/user_config".format(clusterId))
     try {
       Json.parse(res).validate[Map[String, String]].get.apply("config")

@@ -1,8 +1,6 @@
 package xyz.ihac.intellij.plugin.derrick.action
 
-import com.intellij.execution.ExecutionException
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
-import com.intellij.openapi.application.{ApplicationManager, ModalityState}
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.wm.ToolWindowManager
