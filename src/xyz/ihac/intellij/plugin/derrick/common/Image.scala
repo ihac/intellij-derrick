@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 
 class Image(rawName: String, val uuid: String) {
   val (url, username, name, tag) = {
-    val imageRegex = raw"(([^/]+)/)?(\w+)/(\w+):(\w+)".r
+    val imageRegex = raw"(([^/]+)/)?(\w+)/([-a-z0-9]+):([a-zA-Z0-9.]+)".r
     rawName match {
       case imageRegex(_, url, username, name, tag) =>
         if (url != null) (url, username, name, tag)
