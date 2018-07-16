@@ -234,11 +234,15 @@ public class DerrickConfigForm extends DialogWrapper {
     @Override
     protected ValidationInfo doValidate() {
         if (action.equals("Init")) {
+            DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
+            if (registry == null) {
+                return new ValidationInfo("Please select a legal Docker registry", registryComboBox);
+            }
+
             DerrickConfigTableModel model = (DerrickConfigTableModel) derrickConfigTable.getModel();
             int row = model.getImageNameRow();
             if (row >= 0) {
                 String imageName = (String) derrickConfigTable.getValueAt(row, 1);
-                DockerRegistryConfiguration registry = (DockerRegistryConfiguration) registryComboBox.getSelectedItem();
                 if (!ImageNameMatchRegistry.apply(registry).verify(imageName)) {
                     return new ValidationInfo("Please enter valid image name");
                 }
