@@ -1,6 +1,14 @@
 # intellij-derrick
 An IntelliJ IDEA plugin which integrates [Derrick](https://alibaba.github.io/derrick/) and supports automated Kubernetes deployment.
 
+## Features
+
+- Automatically detect application source code and generate Dockerfile, Kubernetes-Yaml by utilizing Derrick.
+- Build Docker image from Dockerfile and run as test container.
+- Push Docker image to remote registry.
+- Deploy application to remote Kubernetes cluster.
+- Support Aliyun Registry and Aliyun Container Service.
+
 ## Prerequisites
 
 You will need:

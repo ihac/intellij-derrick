@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>xyz.ihac.derrick</id>
   <name>Derrick</name>
-  <version>0.2.2-beta</version>
+  <version>0.3.0-beta</version>
   <vendor email="hac@zju.edu.cn" url="https://github.com/ihac/intellij-derrick">Xiao An</vendor>
 
   <description><![CDATA[
@@ -31,6 +31,12 @@
       <li><strong>Important Note:</strong> You can report exception-issues in the Github repository of this plugin. Please
       add at least a comment what you have done when it occurred / how you can reproduce it. It would be even better
       when add an email address so I can contact you in case of questions.</li>
+
+      <li>0.3.0-beta</li>
+        <ul>
+          <li>Refactor exception handling logic</li>
+          <li>Fix a few bugs</li>
+        </ul>
 
       <li>0.2.2-beta</li>
         <ul>
