@@ -45,8 +45,8 @@ trait ActionHelper {
   }
   def isRunning: Boolean = status == RUNNING
   def log(message: String, level: LogLevel): Unit = level match {
-    case ERROR_LEVEL => Logger.error(action, message)
-    case WARN_LEVEL => Logger.warn(action, message)
+    case ERROR_LEVEL    => Logger.error(action, message)
+    case WARN_LEVEL     => Logger.warn(action, message)
     case INFO_LEVEL | _ => Logger.info(action, message)
   }
 }
